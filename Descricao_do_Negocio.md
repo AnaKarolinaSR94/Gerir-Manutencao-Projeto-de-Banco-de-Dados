@@ -1,4 +1,4 @@
-# Modelo de Negócio: GM – Gerir Manutenção
+# Modelo de Negócio: Sistema Gerir Manutenção (SGM)
 
 ## 1. Identificação do Grupo e Participantes
 
@@ -15,7 +15,7 @@
 
 ## 2. Identificação do Projeto
 
-**Nome do Sistema:** GM – Gerir Manutenção
+**Nome do Sistema:** Sistema Gerir Manutenção (SGM)
 
 **Natureza da Aplicação:** Sistema Web de Gestão de Manutenção Industrial
 
@@ -37,7 +37,7 @@ No ambiente industrial contemporâneo, a disponibilidade contínua dos ativos f�
 
 ### 4.2. Objetivos e Proposta de Valor
 
-O projeto GM – Gerir Manutenção visa centralizar, digitalizar e padronizar toda a engenharia e operação de manutenção da fábrica em uma plataforma web integrada. Os objetivos estratégicos e impactos esperados compreendem:
+O Sistema Gerir Manutenção visa centralizar, digitalizar e padronizar toda a engenharia e operação de manutenção da fábrica em uma plataforma web integrada. Os objetivos estratégicos e impactos esperados compreendem:
 
 - **Redução da indisponibilidade:** Mitigar quebras não programadas por meio da automação do agendamento de intervenções preventivas.
 - **Digitalização de ponta a ponta:** Eliminar formulários físicos e garantir a coleta ágil de dados operacionais diretamente no chão de fábrica.
@@ -82,8 +82,8 @@ O sistema abrangerá os seguintes módulos funcionais:
 - **Módulo de Agendamento Preventivo:** Planejamento automatizado de inspeções baseado em intervalos temporais fixos.
 - **Módulo de Auditoria e Fluxo de Trabalho:** Mecanismo de distribuição de OS por prazo e criticidade, além de etapa de aprovação formal pelo supervisor antes da consolidação no histórico.
 - **Módulo de Gestão de Estoque Interno:** Cadastro de peças de reposição, baixa automática do inventário na conclusão de reparos e disparo de alertas de estoque.
-- **Módulo de Indicadores e Relatórios:** Dashboards analíticos atualizados com gráficos de MTBF (*Mean Time Between Failures*), MTTR (*Mean Time To Repair*), e exportação de relatórios em PDF e planilhas.
-- **Módulo de Gestão de Equipe e Carga Massiva:** Painel com o status operacional dos técnicos (Ocupado/Disponível) e suporte à importação de planilhas estruturadas (`.csv`, `.xls`, `.xlsx`).
+- **Módulo de Indicadores e Relatórios:** Dashboards analíticos atualizados com gráficos de MTBF (*Mean Time Between Failures*), MTTR (*Mean Time To Repair*).
+- **Módulo de Gestão de Equipe:** Painel com o status operacional dos técnicos (Ocupado/Disponível).
 
 ### 4.5. Limites do Sistema (Fora de Escopo)
 
