@@ -53,9 +53,9 @@ O sistema Gerir Manutenção contempla o desenvolvimento das seguintes capacidad
 - Notificações via e-mail e interface web do sistema.
 
 ##### 2.1.7 Relatórios e Exportações
-- Geração e exportação de relatório executivo mensal em PDF, consolidando MTBF, MTTR, ranking de máquinas críticas e produtividade da equipe;
-- Relatório de consumo de peças por período e por máquina, exportável em PDF e planilha (XLS/CSV);
-- Exportação de relatório de horas trabalhadas por técnico e por ordem de serviço, com filtros por período, em formato XLS/CSV;
+- Geração e exportação de relatório executivo mensal, consolidando MTBF, MTTR, ranking de máquinas críticas e produtividade da equipe;
+- Relatório de consumo de peças por período e por máquina;
+- Exportação de relatório de horas trabalhadas por técnico e por ordem de serviço, com filtros por período;
 
 #### 2.2 Fora do Escopo
 Para manter a viabilidade do projeto dentro do prazo e do orçamento estabelecidos, as funcionalidades a seguir estão explicitamente excluídas desta versão:
@@ -77,22 +77,19 @@ O sistema atenderá quatro perfis de negócio, cada um com permissões específi
 | Administrador do Sistema | Equipe de TI | Superusuário com acesso total; gerencia contas de usuário e corrige dados em caso de problema (perfil técnico, não de negócio) |
 
 #### 3.2 Requisitos Funcionais - Síntese
-O sistema contempla 17 requisitos funcionais (RF01 a RF17) distribuídos entre os quatro perfis, abrangendo cadastro de equipamentos, registro e agendamento de manutenções, anexo de evidências, controle de estoque, geração de alertas automáticos, emissão de relatórios, distribuição e aprovação de ordens de serviço, monitoramento de equipe e indicadores gerenciais.
+O sistema contempla 16 requisitos funcionais (RF01 a RF16) distribuídos entre os quatro perfis, abrangendo cadastro de equipamentos, registro e agendamento de manutenções, controle de estoque, geração de alertas automáticos, emissão de relatórios, distribuição e aprovação de ordens de serviço, monitoramento de equipe e indicadores gerenciais.
 
 #### 3.3 Requisitos Não Funcionais - Síntese
-O sistema deve satisfazer 12 requisitos não funcionais (RNF01 a RNF12), que estabelecem:
-- Responsividade nativa para tablets e smartphones, sem rolagem horizontal (RNF01);
-- Fluxo de abertura de registro de falha concluído em no máximo 5 cliques a partir da tela inicial (RNF02);
-- Autenticação de todos os usuários com login e senha; autenticação em dois fatores (2FA) obrigatória para os perfis de Supervisor e Gestor (RNF03, RNF09);
-- Carregamento de qualquer página em até 3 segundos em conexões com velocidade mínima de 10 Mbps (RNF04);
-- Suporte à importação de listas de peças e equipamentos via CSV e Excel (RNF05);
-- Disponibilidade mínima de 99,5% no horário de produção (06h às 22h), exceto janelas de manutenção programada comunicadas com 48 horas de antecedência (RNF06);
-- Compatibilidade com as versões atuais dos navegadores Chrome, Firefox, Edge e Safari (RNF07);
-- Conformidade com as diretrizes WCAG 2.1 nível AA para contraste, navegação por teclado e leitores de tela (RNF08);
-- Conformidade com a Lei Geral de Proteção de Dados — LGPD —, garantindo ao titular o direito de acesso, retificação e exclusão de dados pessoais (RNF10);
-- Controle de acesso estritamente por perfil (RBAC), impedindo que um usuário acesse funcionalidades além das autorizadas ao seu papel (RNF11);
-- Comunicação HTTPS com TLS 1.2 ou superior em todas as requisições;
-- Dados sensíveis armazenados criptografados no banco de dados (RNF12).
+O sistema deve satisfazer 10 requisitos não funcionais (RNF01 a RNF10), que estabelecem:
+- Responsividade nativa para tablets e smartphones, sem rolagem horizontal;
+- Fluxo de abertura de registro de falha concluído em no máximo 5 cliques a partir da tela inicial;
+- Autenticação de todos os usuários com login e senha; autenticação em dois fatores (2FA) obrigatória para os perfis de Supervisor e Gestor;
+- Carregamento de qualquer página em até 3 segundos em conexões com velocidade mínima de 10 Mbps;
+- Disponibilidade mínima de 99,5% no horário de produção (06h às 22h), exceto janelas de manutenção programada comunicadas com 48 horas de antecedência;
+- Compatibilidade com as versões atuais dos navegadores Chrome, Firefox, Edge e Safari;
+- Conformidade com as diretrizes WCAG 2.1 nível AA para contraste, navegação por teclado e leitores de tela;
+- Conformidade com a Lei Geral de Proteção de Dados — LGPD —, garantindo ao titular o direito de acesso, retificação e exclusão de dados pessoais;
+- Controle de acesso estritamente por perfil (RBAC), impedindo que um usuário acesse funcionalidades além das autorizadas ao seu papel;
 
 ### 4. Premissas e Restrições
 #### 4.1 Premissas
@@ -117,21 +114,21 @@ O sistema deve satisfazer 12 requisitos não funcionais (RNF01 a RNF12), que est
 ### 6. Partes Interessadas
 | Nome | Cargo | Interesse/Influência |
 |-------------------|---------------|------|
-| Maria de Oliveira | Patrocinadora (Sponsor) | Interesse e influência muito alto. Responsável pela aprovação macro e liberação da reserva de contingência de R$ 60.000,00. Assina o documento de escopo e o TAP |
-| Roberto Lima | Gerente de Projetos | Interesse muito alto na empresa e influência alta. É o líder nomeado no TAP. Responsável por controlar o teto de R$ 480.000,00 e acionar a reserva de contingência somente com aprovação da Sponsor |
-| João Silva | Gerente e Decisor de Negócios | Interesse e influência muito alto. Principal validador das regras de negócio do sistema. Deve participar ativamente da homologação prevista para 30/10/2026 |
+| Maria de Oliveira | Patrocinadora (Sponsor) | Interesse e influência muito alto. Responsável pela aprovação macro e liberação da reserva de contingência. Assina o documento de escopo e o TAP |
+| Roberto Lima | Gerente de Projetos | Interesse muito alto na empresa e influência alta. É o líder nomeado no TAP. Responsável por controlar o teto orçamentário e acionar a reserva de contingência somente com aprovação da Sponsor |
+| João Silva | Gerente e Decisor de Negócios | Interesse e influência muito alto. Principal validador das regras de negócio do sistema. Deve participar ativamente da homologação. |
 | Técnicos de Manutenção | Usuários Finais-Execução | Interesse muito alto e baixa influência. Usuários mais frequentes do sistema. A meta de 80% de adoção nos primeiros 90 dias depende diretamente deste grupo. O treinamento específico para este perfil é crítico. |
-| Supervisores de Manutenção | Usuários Finais-Supervisão | Interesse muito alto e média influência. Papel-chave no fluxo de aprovação de OS (UC12) — sem aprovação, nenhuma manutenção é consolidada no histórico. |
-| Equipe Administrativa | Usuários Finais-Cadastros e Relatórios | Interesse alto e baixa influência. A qualidade dos dados cadastrais é pré-condição para o funcionamento correto de todos os 21 casos de uso. |
+| Supervisores de Manutenção | Usuários Finais-Supervisão | Interesse muito alto e média influência. Papel-chave no fluxo de aprovação de OS — sem aprovação, nenhuma manutenção é consolidada no histórico. |
+| Equipe Administrativa | Usuários Finais-Cadastros e Relatórios | Interesse alto e baixa influência. |
 | Equipe de Desenvolvimento | Analistas e Desenvolvedores | Interesse muito alto e baixa influência. Time técnico responsável pelas fases de Construção e Testes da EAP. |
 | Equipe de TI e Suporte | Sustentação e Infraestrutura | Médio interesse e influência. Responsável pela infraestrutura local e governança de dados. Deve ser envolvida a partir da fase de Testes para preparar o ambiente de produção. |
 | Fornecedores de Peças de Reposição | Partes Afetadas Indiretamente/Externa a organização | Alto interesse e muito baixa influência. Impactados indiretamente pelos alertas de estoque mínimo e relatórios de consumo de peças. Não participam do projeto mas podem ser afetados por decisões de compra baseadas nos dados do sistema. |
-| Autoridade Nacional de Proteção de Dados (ANPD) | Órgão Regulador | Muito baixo interesse e muito alta influência. Não participa ativamente do projeto mas tem poder regulatório. A conformidade com RNF10 e RNF12 deve ser verificada antes do go-live de fev/2027. |
+| Autoridade Nacional de Proteção de Dados (ANPD) | Órgão Regulador | Muito baixo interesse e muito alta influência. Não participa ativamente do projeto mas tem poder regulatório. |
 
 ### 7. Critérios de Aceitação do Projeto
 O projeto será considerado concluído com sucesso quando todos os critérios abaixo forem atendidos:
-- 100% dos 17 requisitos funcionais (RF01 a RF17) implementados e validados em ambiente de homologação;
-- Todos os 12 requisitos não funcionais (RNF01 a RNF12) verificados por testes específicos documentados;
+- 100% dos 16 requisitos funcionais (RF01 a RF16) implementados e validados em ambiente de homologação;
+- Todos os 10 requisitos não funcionais (RNF01 a RNF10) verificados por testes específicos documentados;
 - Taxa de adoção igual ou superior a 80% da equipe técnica nos primeiros 90 dias de operação;
 - Redução de no mínimo 20% nas falhas corretivas não planejadas nos primeiros 3 meses de uso em relação à linha de base;
 - Homologação formal aprovada pelos representantes dos quatro perfis de usuário;
