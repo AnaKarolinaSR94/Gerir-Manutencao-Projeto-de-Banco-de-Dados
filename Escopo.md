@@ -76,8 +76,6 @@ O sistema atenderá quatro perfis de negócio, cada um com permissões específi
 | Equipe Administrativa | Carla Mendes | Cadastrar equipamentos e peças, importar listas, exportar horas trabalhadas, receber alertas de estoque mínimo |
 | Administrador do Sistema | Equipe de TI | Superusuário com acesso total; gerencia contas de usuário e corrige dados em caso de problema (perfil técnico, não de negócio) |
 
-> A matriz completa de permissões por perfil está consolidada em [`Matriz_Permissoes.md`](docs/Matriz_Permissoes.md).
-
 #### 3.2 Requisitos Funcionais - Síntese
 O sistema contempla 17 requisitos funcionais (RF01 a RF17) distribuídos entre os quatro perfis, abrangendo cadastro de equipamentos, registro e agendamento de manutenções, anexo de evidências, controle de estoque, geração de alertas automáticos, emissão de relatórios, distribuição e aprovação de ordens de serviço, monitoramento de equipe e indicadores gerenciais.
 
