@@ -1,0 +1,211 @@
+@startuml
+title DER Relacional (Modelo Logico) - Gerir Manutencao (SGM)
+skinparam linetype ortho
+skinparam defaultFontName Arial
+skinparam defaultFontSize 11
+skinparam roundcorner 4
+skinparam nodesep 40
+skinparam ranksep 60
+hide circle
+hide empty methods
+
+package "Pessoas" #F3F8FF {
+  entity "usuario" as usuario {
+    * id_usuario : SERIAL <<PK>>
+    --
+    * nome : VARCHAR(120)
+    * login : VARCHAR(60)
+    * senha_hash : VARCHAR(255)
+    * email : VARCHAR(120)
+    telefone : VARCHAR(20)
+    * status_2fa : BOOLEAN
+    * ativo : BOOLEAN
+    * data_cadastro : TIMESTAMP
+    * tipo_usuario : CHAR(1)
+  }
+  entity "equipe" as equipe {
+    * id_equipe : SERIAL <<PK>>
+    --
+    * nome : VARCHAR(80)
+    * turno : VARCHAR(20)
+    * id_supervisor : INTEGER <<FK>>
+  }
+  entity "tecnico" as tecnico {
+    * id_usuario : INTEGER <<PK,FK>>
+    --
+    * status_operacional : VARCHAR(12)
+    especialidade : VARCHAR(60)
+    * id_equipe : INTEGER <<FK>>
+  }
+  entity "supervisor" as supervisor {
+    * id_usuario : INTEGER <<PK,FK>>
+    --
+    registro_profissional : VARCHAR(30)
+  }
+  entity "gestor" as gestor {
+    * id_usuario : INTEGER <<PK,FK>>
+    --
+    cargo : VARCHAR(60)
+  }
+  entity "administrativo" as administrativo {
+    * id_usuario : INTEGER <<PK,FK>>
+    --
+    setor : VARCHAR(60)
+  }
+  entity "administrador_sistema" as administrador_sistema {
+    * id_usuario : INTEGER <<PK,FK>>
+    --
+  }
+}
+
+package "Ativos" #F4FFF3 {
+  entity "linha_producao" as linha_producao {
+    * id_linha : SERIAL <<PK>>
+    --
+    * nome : VARCHAR(80)
+    setor : VARCHAR(80)
+  }
+  entity "equipamento" as equipamento {
+    * id_equipamento : SERIAL <<PK>>
+    --
+    * codigo : VARCHAR(20)
+    * nome : VARCHAR(100)
+    fabricante : VARCHAR(80)
+    * modelo : VARCHAR(80)
+    * numero_serie : VARCHAR(60)
+    localizacao : VARCHAR(120)
+    * criticidade : VARCHAR(5)
+    * horimetro_atual : NUMERIC(10,1)
+    data_aquisicao : DATE
+    * ativo : BOOLEAN
+    * id_linha : INTEGER <<FK>>
+  }
+  entity "item_checklist" as item_checklist {
+    * id_equipamento : INTEGER <<PK,FK>>
+    * num_item : SMALLINT <<PK>>
+    --
+    * descricao : VARCHAR(200)
+    * obrigatorio : BOOLEAN
+  }
+  entity "plano_preventivo" as plano_preventivo {
+    * id_plano : SERIAL <<PK>>
+    --
+    * descricao : VARCHAR(150)
+    * periodicidade : VARCHAR(10)
+    * proxima_data : DATE
+    * ativo : BOOLEAN
+    * id_equipamento : INTEGER <<FK>>
+  }
+}
+
+package "Manutencao" #FFF8EE {
+  entity "ordem_servico" as ordem_servico {
+    * codigo_os : SERIAL <<PK>>
+    --
+    * tipo_os : CHAR(1)
+    * descricao : VARCHAR(500)
+    * data_abertura : TIMESTAMP
+    * prioridade : VARCHAR(5)
+    prazo : DATE
+    * status : VARCHAR(22)
+    data_inicio_execucao : TIMESTAMP
+    data_fim_execucao : TIMESTAMP
+    leitura_horimetro : NUMERIC(10,1)
+    decisao_avaliacao : VARCHAR(9)
+    data_avaliacao : TIMESTAMP
+    justificativa : VARCHAR(500)
+    * id_equipamento : INTEGER <<FK>>
+    * id_tecnico : INTEGER <<FK>>
+    id_supervisor : INTEGER <<FK>>
+    id_supervisor_avaliador : INTEGER <<FK>>
+  }
+  entity "manutencao_corretiva" as manutencao_corretiva {
+    * codigo_os : INTEGER <<PK,FK>>
+    --
+    causa_falha : VARCHAR(300)
+    * impacto_producao : BOOLEAN
+    data_hora_falha : TIMESTAMP
+  }
+  entity "manutencao_preventiva" as manutencao_preventiva {
+    * codigo_os : INTEGER <<PK,FK>>
+    --
+    observacao_geral : TEXT
+    id_plano : INTEGER <<FK>>
+  }
+  entity "resultado_checklist" as resultado_checklist {
+    * codigo_os : INTEGER <<PK,FK>>
+    * id_equipamento : INTEGER <<PK,FK>>
+    * num_item : SMALLINT <<PK,FK>>
+    --
+    * resultado : VARCHAR(14)
+    observacao : VARCHAR(300)
+  }
+}
+
+package "Estoque" #FFF2F2 {
+  entity "peca" as peca {
+    * id_peca : SERIAL <<PK>>
+    --
+    * codigo : VARCHAR(30)
+    * descricao : VARCHAR(150)
+    * unidade_medida : VARCHAR(10)
+    * fornecedor : VARCHAR(120)
+    * estoque_minimo : INTEGER
+    * quantidade_atual : INTEGER
+    * ativo : BOOLEAN
+  }
+  entity "baixa_peca" as baixa_peca {
+    * codigo_os : INTEGER <<PK,FK>>
+    * id_peca : INTEGER <<PK,FK>>
+    --
+    * quantidade : INTEGER
+    * data_baixa : TIMESTAMP
+  }
+}
+
+package "Notificacao" #F8F2FF {
+  entity "notificacao" as notificacao {
+    * id_notificacao : SERIAL <<PK>>
+    --
+    * tipo : VARCHAR(15)
+    * mensagem : VARCHAR(500)
+    * data_geracao : TIMESTAMP
+    codigo_os : INTEGER <<FK>>
+    id_peca : INTEGER <<FK>>
+  }
+  entity "notificacao_usuario" as notificacao_usuario {
+    * id_notificacao : INTEGER <<PK,FK>>
+    * id_usuario : INTEGER <<PK,FK>>
+    --
+    * canal : VARCHAR(10)
+    data_envio : TIMESTAMP
+    data_leitura : TIMESTAMP
+  }
+}
+
+supervisor ||--o{ equipe
+usuario ||--o{ tecnico
+equipe ||--o{ tecnico
+usuario ||--o{ supervisor
+usuario ||--o{ gestor
+usuario ||--o{ administrativo
+usuario ||--o{ administrador_sistema
+linha_producao ||--o{ equipamento
+equipamento ||--o{ item_checklist
+equipamento ||--o{ plano_preventivo
+equipamento ||--o{ ordem_servico
+tecnico ||--o{ ordem_servico
+supervisor |o--o{ ordem_servico
+supervisor |o--o{ ordem_servico
+ordem_servico ||--o{ manutencao_corretiva
+ordem_servico ||--o{ manutencao_preventiva
+plano_preventivo |o--o{ manutencao_preventiva
+manutencao_preventiva ||--o{ resultado_checklist
+item_checklist ||--o{ resultado_checklist
+ordem_servico ||--o{ baixa_peca
+peca ||--o{ baixa_peca
+ordem_servico |o--o{ notificacao
+peca |o--o{ notificacao
+notificacao ||--o{ notificacao_usuario
+usuario ||--o{ notificacao_usuario
+@enduml

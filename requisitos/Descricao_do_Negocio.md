@@ -1,4 +1,4 @@
-# Modelo de Negócio: Sistema Gerir Manutenção (SGM)
+# Modelo de Negócio: Gerir Manutenção (SGM)
 
 ## 1. Identificação do Grupo e Participantes
 
@@ -15,7 +15,7 @@
 
 ## 2. Identificação do Projeto
 
-**Nome do Sistema:** Sistema Gerir Manutenção (SGM)
+**Nome do Sistema:** Gerir Manutenção (SGM)
 
 **Natureza da Aplicação:** Sistema Web de Gestão de Manutenção Industrial
 
@@ -37,7 +37,7 @@ No ambiente industrial contemporâneo, a disponibilidade contínua dos ativos f�
 
 ### 4.2. Objetivos e Proposta de Valor
 
-O Sistema Gerir Manutenção visa centralizar, digitalizar e padronizar toda a engenharia e operação de manutenção da fábrica em uma plataforma web integrada. Os objetivos estratégicos e impactos esperados compreendem:
+O Gerir Manutenção (SGM) visa centralizar, digitalizar e padronizar toda a engenharia e operação de manutenção da fábrica em uma plataforma web integrada. Os objetivos estratégicos e impactos esperados compreendem:
 
 - **Redução da indisponibilidade:** Mitigar quebras não programadas por meio da automação do agendamento de intervenções preventivas.
 - **Digitalização de ponta a ponta:** Eliminar formulários físicos e garantir a coleta ágil de dados operacionais diretamente no chão de fábrica.
@@ -52,7 +52,7 @@ O sistema deve atender quatro perfis operacionais e estratégicos:
 #### Técnico de Manutenção
 
 - **Perfil:** Mecânico sênior que atua diretamente no chão de fábrica.
-- **Atuação no Sistema:** Registra manutenções corretivas em campo via dispositivo móvel, preenche checklists de manutenções preventivas, anexa evidências de falhas e realiza a baixa das peças utilizadas.
+- **Atuação no Sistema:** Registra manutenções corretivas em campo via dispositivo móvel, preenche checklists de manutenções preventivas e realiza a baixa das peças utilizadas.
 - **Necessidade Central:** Agilidade no registro sem exigência de navegação burocrática, com histórico do ativo acessível na ponta dos dedos.
 
 #### Supervisor de Manutenção
@@ -64,30 +64,34 @@ O sistema deve atender quatro perfis operacionais e estratégicos:
 #### Gestor / Gerente Industrial
 
 - **Perfil:** Executivo focado em metas de volume fabril, redução de custos e disponibilidade global dos ativos.
-- **Atuação no Sistema:** Acompanha dashboards com indicadores de confiabilidade (MTBF e MTTR), visualiza rankings de máquinas mais críticas e exporta relatórios executivos de produtividade.
+- **Atuação no Sistema:** Acompanha dashboards com indicadores de confiabilidade (MTBF e MTTR), visualiza rankings de máquinas mais críticas e consulta relatórios executivos de produtividade.
 - **Necessidade Central:** Dados consolidados e métricas precisas para embasar decisões estratégicas de aquisição e reforma de maquinário.
 
 #### Equipe Administrativa
 
 - **Perfil:** Assistente administrativa responsável pela interface entre documentação técnica, almoxarifado e cadastros-base.
-- **Atuação no Sistema:** Realiza o cadastro de máquinas e insumos, executa importações em lote de dados via arquivos CSV/Excel e monitora alertas de estoque mínimo para encaminhar necessidades de reposição.
-- **Necessidade Central:** Eliminação de redigitação manual e saneamento consistente da base de dados de ativos e peças.
+- **Atuação no Sistema:** Realiza o cadastro de máquinas, dos checklists de preventiva e dos insumos, e monitora alertas de estoque mínimo para encaminhar necessidades de reposição.
+- **Necessidade Central:** Cadastros centralizados e consistentes de ativos e peças, sem planilhas paralelas.
 
 ### 4.4. Escopo Funcional da Solução
 
 O sistema abrangerá os seguintes módulos funcionais:
 
-- **Módulo de Gestão de Ativos:** Cadastro detalhado de máquinas industriais e classificação de criticidade.
+- **Módulo de Gestão de Ativos:** Cadastro detalhado de máquinas industriais, classificação de criticidade e checklist de preventiva de cada máquina.
 - **Módulo de Ordens de Serviço (OS):** Registro digital de manutenções corretivas e preventivas.
-- **Módulo de Agendamento Preventivo:** Planejamento automatizado de inspeções baseado em intervalos temporais fixos.
+- **Módulo de Agendamento Preventivo:** Planejamento automatizado de inspeções por periodicidade fixa (Diária, Semanal, Mensal, Trimestral, Semestral ou Anual).
 - **Módulo de Auditoria e Fluxo de Trabalho:** Mecanismo de distribuição de OS por prazo e criticidade, além de etapa de aprovação formal pelo supervisor antes da consolidação no histórico.
 - **Módulo de Gestão de Estoque Interno:** Cadastro de peças de reposição, baixa automática do inventário na conclusão de reparos e disparo de alertas de estoque.
-- **Módulo de Indicadores e Relatórios:** Dashboards analíticos atualizados com gráficos de MTBF (*Mean Time Between Failures*), MTTR (*Mean Time To Repair*).
+- **Módulo de Indicadores e Relatórios:** Dashboards analíticos com MTBF (*Mean Time Between Failures*) e MTTR (*Mean Time To Repair*), ranking de máquinas críticas e relatórios consultados em tela (executivo, consumo de peças e horas trabalhadas).
 - **Módulo de Gestão de Equipe:** Painel com o status operacional dos técnicos (Ocupado/Disponível).
+- **Módulo de Alertas e Notificações:** Avisos automáticos de proximidade e atraso de preventivas e de estoque mínimo, por e-mail e pela interface web.
 
 ### 4.5. Limites do Sistema (Fora de Escopo)
 
 Para manter o escopo técnico enxuto, coeso e viável:
+
+- **Importação e exportação de arquivos:** O sistema não importa planilhas (CSV/Excel) nem exporta relatórios em PDF ou planilha; os relatórios são consultados na própria interface.
+- **Anexos de arquivos:** Não há upload de fotos, documentos ou manuais; as evidências são descritas em texto na ordem de serviço.
 
 - **Módulo de Compras e Cotações:** O processo de compras, orçamentos com terceiros e seleção de fornecedores ocorrerá fora do sistema.
 - **Gestão Financeira e Faturamento:** O sistema não realiza apuração de custos monetários das ordens, liquidação contábil ou emissão de notas fiscais (processos delegados aos sistemas ERP corporativos existentes).

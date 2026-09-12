@@ -1,4 +1,4 @@
-# GERIR MANUTENÇÃO
+# GERIR MANUTENÇÃO (SGM)
 ## Escopo do Projeto
 
 ### 1.  Identificação e Contextualização do Projeto
@@ -24,11 +24,12 @@ A ausência de um sistema integrado de gestão de manutenção gera custos eleva
 #### 2.1 Dentro do Escopo
 O sistema Gerir Manutenção contempla o desenvolvimento das seguintes capacidades:
 ##### 2.1.1 Gestão de Equipamentos
-- Cadastro de máquinas industriais com nome, modelo, número de série (único), localização na fábrica e nível de criticidade (Alta, Média ou Baixa);
+- Cadastro de máquinas industriais com código interno, nome, fabricante, modelo, número de série (único), linha de produção, localização na fábrica e nível de criticidade (Alta, Média ou Baixa);
+- Cadastro do checklist de manutenção preventiva de cada máquina (itens de verificação, com indicação dos obrigatórios);
 ##### 2.1.2 Gestão de Manutenções
 - Registro de manutenção corretiva com seleção de máquina por código ou nome parcial, descrição da falha (até 500 caracteres), peças trocadas e data/hora automática;
 - Registro de manutenção preventiva com checklist de itens específico por máquina, marcação de itens como verificado ou não aplicável, observações complementares e data/hora automática;
-- Agendamento automatizado de manutenções preventivas com periodicidade Diária, Semanal, Mensal, Trimestral, Semestral ou Anual, calculada com base na última leitura de horímetro informada manualmente pelo técnico;
+- Agendamento automatizado de manutenções preventivas com periodicidade Diária, Semanal, Mensal, Trimestral, Semestral ou Anual, com a próxima data calculada a partir da periodicidade definida para cada máquina; o técnico registra a leitura do horímetro a cada manutenção, apenas para fins de histórico;
 
 ##### 2.1.3 Gestão de Ordens de Serviço
 - Distribuição de ordens de serviço pelo supervisor a técnicos específicos, com definição de máquina, tipo (corretiva ou preventiva), descrição, prioridade (Alta, Média ou Baixa) e prazo de entrega;
@@ -37,7 +38,7 @@ O sistema Gerir Manutenção contempla o desenvolvimento das seguintes capacidad
 - Visualização de tarefas preventivas da semana por técnico, ordenadas por data de vencimento, com destaques visuais para proximidade de prazo (menos de 24 horas) e atraso (mais de 24 horas).
 
 ##### 2.1.4 Gestão de Estoque de Peças
-- Cadastro de peças de reposição com código único, descrição, fornecedor, estoque mínimo e quantidade atual;
+- Cadastro de peças de reposição com código único, descrição, unidade de medida, nome do fornecedor homologado, estoque mínimo e quantidade atual;
 - Baixa automática de peças no estoque interno no momento do registro de manutenção;
 - Alerta automático ao perfil Administrativo e ao Supervisor quando a quantidade de uma peça atingir ou ficar abaixo do estoque mínimo, com supressão de alertas duplicados por 24 horas.
 
@@ -52,15 +53,17 @@ O sistema Gerir Manutenção contempla o desenvolvimento das seguintes capacidad
 - Envio automático de alertas ao técnico responsável e ao supervisor quando uma manutenção preventiva estiver a menos de 24 horas do prazo (alerta de proximidade) ou estiver atrasada há mais de 24 horas (alerta de atraso);
 - Notificações via e-mail e interface web do sistema.
 
-##### 2.1.7 Relatórios e Exportações
-- Geração e exportação de relatório executivo mensal, consolidando MTBF, MTTR, ranking de máquinas críticas e produtividade da equipe;
-- Relatório de consumo de peças por período e por máquina;
-- Exportação de relatório de horas trabalhadas por técnico e por ordem de serviço, com filtros por período;
+##### 2.1.7 Relatórios (consulta em tela)
+- Relatório executivo mensal consolidando MTBF, MTTR, ranking de máquinas críticas e produtividade da equipe;
+- Relatório de consumo de peças (quantidades) por período e por máquina;
+- Relatório de horas trabalhadas por técnico e por ordem de serviço, com filtros por período;
 
 #### 2.2 Fora do Escopo
 Para manter a viabilidade do projeto dentro do prazo e do orçamento estabelecidos, as funcionalidades a seguir estão explicitamente excluídas desta versão:
 - Integração completa com sistemas ERP (Enterprise Resource Planning);
-- Controle financeiro detalhado dos custos de manutenção por centro de custo;
+- Importação de dados por planilhas (CSV/Excel) e exportação de relatórios em PDF ou planilha;
+- Anexo de arquivos (fotos, documentos ou manuais) a ordens de serviço ou equipamentos;
+- Controle financeiro de custos de manutenção (valores de peças, custos por ordem de serviço ou centro de custo);
 - Compra automática de peças ou gestão completa de cadeia de suprimentos;
 - Aplicação mobile nativa para dispositivos iOS ou Android;
 - Inteligência artificial para previsão preditiva de falhas — funcionalidade a ser avaliada em versões futuras do sistema.
@@ -72,18 +75,18 @@ O sistema atenderá quatro perfis de negócio, cada um com permissões específi
 |--------|---------|-----------------------|
 | Técnico de Manutenção | Ricardo Santos | Registrar manutenções, consultar histórico, visualizar tarefas, dar baixa em peças, receber alertas |
 | Supervisor de Manutenção | Sandra Oliveira | Distribuir e aprovar OS, agendar preventivas, monitorar equipe, visualizar calendário, gerar relatório de peças |
-| Gestor / Gerente | Roberto Meireles | Visualizar dashboard de KPIs, acessar ranking de máquinas críticas, monitorar produtividade, exportar relatório executivo |
-| Equipe Administrativa | Carla Mendes | Cadastrar equipamentos e peças, importar listas, exportar horas trabalhadas, receber alertas de estoque mínimo |
+| Gestor / Gerente | Roberto Meireles | Visualizar dashboard de KPIs, acessar ranking de máquinas críticas, monitorar produtividade, consultar relatório executivo |
+| Equipe Administrativa | Carla Mendes | Cadastrar equipamentos, checklists e peças, consultar horas trabalhadas, receber alertas de estoque mínimo |
 | Administrador do Sistema | Equipe de TI | Superusuário com acesso total; gerencia contas de usuário e corrige dados em caso de problema (perfil técnico, não de negócio) |
 
 #### 3.2 Requisitos Funcionais - Síntese
-O sistema contempla 16 requisitos funcionais (RF01 a RF16) distribuídos entre os quatro perfis, abrangendo cadastro de equipamentos, registro e agendamento de manutenções, controle de estoque, geração de alertas automáticos, emissão de relatórios, distribuição e aprovação de ordens de serviço, monitoramento de equipe e indicadores gerenciais.
+O sistema contempla 16 requisitos funcionais (RF01 a RF16) distribuídos entre os quatro perfis, abrangendo cadastro de equipamentos e checklists, registro e agendamento de manutenções, controle de estoque, geração de alertas automáticos, relatórios em tela, distribuição e aprovação de ordens de serviço, monitoramento de equipe e indicadores gerenciais.
 
 #### 3.3 Requisitos Não Funcionais - Síntese
 O sistema deve satisfazer 10 requisitos não funcionais (RNF01 a RNF10), que estabelecem:
 - Responsividade nativa para tablets e smartphones, sem rolagem horizontal;
 - Fluxo de abertura de registro de falha concluído em no máximo 5 cliques a partir da tela inicial;
-- Autenticação de todos os usuários com login e senha; autenticação em dois fatores (2FA) obrigatória para os perfis de Supervisor e Gestor;
+- Autenticação de todos os usuários com login e senha; autenticação em dois fatores (2FA) obrigatória para os perfis de Supervisor, Gestor e Administrador do Sistema;
 - Carregamento de qualquer página em até 3 segundos em conexões com velocidade mínima de 10 Mbps;
 - Disponibilidade mínima de 99,5% no horário de produção (06h às 22h), exceto janelas de manutenção programada comunicadas com 48 horas de antecedência;
 - Compatibilidade com as versões atuais dos navegadores Chrome, Firefox, Edge e Safari;

@@ -1,0 +1,158 @@
+@startsalt P01_cadastro_equipamento
+{+
+  <b>Gerir Manutencao (SGM)</b> | Cadastros > Equipamentos | . | . | Carla (Administrativo) | [Sair]
+  ==
+  {
+    <b>Cadastrar Equipamento</b>
+    .
+    Codigo interno*  | "EQ-0142            "
+    Nome*            | "Prensa hidraulica 200t"
+    Fabricante       | "Schuler            "
+    Modelo*          | "PH-200             "
+    Numero de serie* | "PH200-2019-00871   "
+    Linha de producao* | ^Linha 3 - Estamparia^
+    Localizacao      | "Galpao B, baia 3   "
+    Criticidade*     | (X) Alta | ( ) Media | ( ) Baixa
+    Horimetro atual  | "12480,5" | h
+    Data de aquisicao | "14/03/2019"
+    .
+    <b>Checklist de preventiva desta maquina</b>
+    {#
+      #  | Item                                   | Obrigatorio | .
+      1  | Verificar nivel de oleo hidraulico     | (X)         | [Remover]
+      2  | Inspecionar vedacoes do cilindro       | (X)         | [Remover]
+      3  | Testar parada de emergencia            | (X)         | [Remover]
+    }
+    [+ Adicionar item]
+    .
+    [  Salvar  ] | [ Cancelar ]
+  }
+}
+@endsalt
+
+@startsalt P02_registrar_corretiva
+{+
+  <b>Gerir Manutencao (SGM)</b> | Nova Manutencao Corretiva | . | . | Ricardo (Tecnico) | [Sair]
+  ==
+  {
+    <b>Registrar Manutencao Corretiva</b>  (OS aberta em campo)
+    .
+    Maquina*          | "Prensa hidr" | [Buscar] | > EQ-0142 - Prensa hidraulica 200t
+    Data/hora         | 11/09/2026 14:05 (automatica)
+    Momento da falha  | "11/09/2026 13:20"
+    Parou a producao? | (X) Sim | ( ) Nao
+    Descricao da falha* (max 500) | "Vazamento no cilindro principal, perda de pressao"
+    Causa identificada | "Retentor do cilindro rompido"
+    Leitura do horimetro | "12481,2" | h
+    Prioridade*       | ( ) Alta | (X) Media | ( ) Baixa
+    .
+    <b>Pecas utilizadas</b> (baixa automatica no estoque)
+    {#
+      Codigo   | Descricao                     | Qtd | Saldo | .
+      RET-3310 | Retentor 80mm NBR             | 2   | 14    | [Remover]
+      OLH-0021 | Oleo hidraulico ISO 68 (L)    | 20  | 180   | [Remover]
+    }
+    [+ Adicionar peca]
+    .
+    [ Salvar e enviar para aprovacao ] | [ Salvar rascunho ] | [ Cancelar ]
+  }
+}
+@endsalt
+
+@startsalt P03_checklist_preventiva
+{+
+  <b>Gerir Manutencao (SGM)</b> | Minhas Tarefas > OS 1027 | . | . | Ricardo (Tecnico) | [Sair]
+  ==
+  {
+    <b>Manutencao Preventiva - OS 1027</b>
+    Equipamento: EQ-0087 Torno CNC | Plano: Lubrificacao (Mensal) | Prazo: 12/09/2026 | Prioridade: Alta
+    Inicio da execucao: 11/09/2026 09:12 | Leitura do horimetro* | "8.302,0" | h
+    .
+    <b>Checklist do equipamento EQ-0087</b>
+    {#
+      #  | Item                                   | Resultado                      | Observacao
+      1  | Verificar nivel de oleo do barramento  | (X) Verificado ( ) Nao aplic.  | "ok"
+      2  | Lubrificar guias lineares              | (X) Verificado ( ) Nao aplic.  | "               "
+      3  | Inspecionar correias do eixo-arvore    | ( ) Verificado (X) Nao aplic.  | "sem correia"
+      4* | Testar parada de emergencia            | ( ) Verificado ( ) Nao aplic.  | "               "
+    }
+    * item obrigatorio - a conclusao fica bloqueada enquanto houver item obrigatorio sem resposta
+    .
+    Observacoes complementares | "                                              "
+    .
+    [ Concluir e enviar para aprovacao ] | [ Salvar rascunho ] | [ Voltar ]
+  }
+}
+@endsalt
+
+@startsalt P04_aprovar_os
+{+
+  <b>Gerir Manutencao (SGM)</b> | Ordens para Aprovacao | . | . | Sandra (Supervisor) | [Sair]
+  ==
+  {
+    <b>Ordens aguardando aprovacao</b>
+    {#
+      OS   | Tipo       | Equipamento                 | Tecnico  | Concluida em      | .
+      1025 | Corretiva  | EQ-0142 Prensa hidraulica   | Ricardo  | 11/09/2026 16:40  | [Analisar]
+      1027 | Preventiva | EQ-0087 Torno CNC           | Ricardo  | 11/09/2026 10:05  | [Analisar]
+    }
+    ==
+    <b>OS 1025 - Corretiva</b> | Aberta em 11/09/2026 14:05 | Execucao: 14:10 - 16:40 (2h30)
+    Descricao: Vazamento no cilindro principal, perda de pressao | Causa: retentor rompido | Parou producao: Sim
+    Pecas: RET-3310 x2, OLH-0021 x20 | Horimetro: 12481,2 h
+    .
+    Decisao* | (X) Aprovar | ( ) Rejeitar
+    Justificativa (obrigatoria se rejeitar) | "                                              "
+    [ Confirmar ] | [ Cancelar ]
+  }
+}
+@endsalt
+
+@startsalt P05_cadastro_peca
+{+
+  <b>Gerir Manutencao (SGM)</b> | Cadastros > Pecas | . | . | Carla (Administrativo) | [Sair]
+  ==
+  {
+    <b>Cadastrar Peca de Reposicao</b>
+    .
+    Codigo unico*     | "RET-3310"
+    Descricao*        | "Retentor 80mm NBR"
+    Unidade de medida | ^UN^
+    Fornecedor*       | "Vedacoes Sul Ltda"
+    Estoque minimo*   | "10"
+    Quantidade atual* | "14"
+    .
+    [  Salvar  ] | [ Cancelar ]
+    ==
+    <b>Alertas de estoque minimo (ultimas 24h)</b>
+    {#
+      Peca      | Descricao              | Atual | Minimo | Gerado em
+      OLH-0021  | Oleo hidraulico ISO 68 | 160   | 200    | 11/09/2026 16:41
+    }
+  }
+}
+@endsalt
+
+@startsalt P06_dashboard
+{+
+  <b>Gerir Manutencao (SGM)</b> | Dashboard de Indicadores | . | . | Roberto (Gestor) | [Sair]
+  ==
+  {
+    Periodo: | ( ) 30 dias | (X) 90 dias | ( ) 180 dias | Linha: | ^Todas^ | atualiza a cada 60 s
+    .
+    { <b>MTBF medio</b> | <b>MTTR medio</b> | <b>Disponibilidade</b> | <b>OS no periodo</b>
+      312 h            | 2,4 h            | 97,1 %                | 148 (96 prev. / 52 corr.) }
+    .
+    <b>Ranking - 10 maquinas mais criticas</b> (falhas no periodo)
+    {#
+      #  | Equipamento                  | Falhas | MTBF   | MTTR
+      1  | EQ-0142 Prensa hidraulica    | 7      | 128 h  | 3,1 h
+      2  | EQ-0087 Torno CNC            | 5      | 190 h  | 1,8 h
+      3  | EQ-0210 Esteira principal    | 4      | 220 h  | 0,9 h
+    }
+    .
+    <b>Produtividade da equipe</b> | Equipe: | ^Turno Manha^ | Tecnico: | ^Todos^
+    Planejadas: 96 | Concluidas: 89 | Conclusao: 92,7 %
+  }
+}
+@endsalt

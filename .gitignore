@@ -1,0 +1,4 @@
+ferramentas/_build/
+__pycache__/
+*.pyc
+~$*.docx
