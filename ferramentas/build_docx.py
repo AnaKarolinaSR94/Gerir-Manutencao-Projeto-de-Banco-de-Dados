@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Gera o documento Word das Entregas 1 (Projeto Logico Conceitual) e 2 (Projeto Logico Relacional).
+"""Gera o documento Word das Entregas 1 (Projeto Logico Conceitual), 2 (Projeto Logico Relacional) e 3 (Projeto Fisico).
 Revisao de 11/09/2026: escopo alinhado aos documentos do grupo (requisitos/*.md) e modelo simplificado (ADR 0004)."""
 import sys
 sys.path.insert(0, "ferramentas")
@@ -167,7 +167,8 @@ P("PROJETO FINAL DE BANCO DE DADOS", bold=True, size=20, align="center", space_a
 P(SIS, bold=True, size=24, align="center", space_after=6)
 P("Sistema Web de Gestão de Manutenção Industrial", size=13, align="center", space_after=30)
 P("Entrega 1 – Projeto Lógico Conceitual", size=12, align="center", space_after=0)
-P("Entrega 2 – Projeto Lógico Relacional", size=12, align="center", space_after=40)
+P("Entrega 2 – Projeto Lógico Relacional", size=12, align="center", space_after=0)
+P("Entrega 3 – Projeto Físico", size=12, align="center", space_after=40)
 P("Integrantes do grupo", bold=True, size=12, align="center", space_after=2)
 for n in ["Ana Karolina da Silva Reges", "Matheus Vaz Teixeira", "Micael Henrique da Silva Fontes", "Reginaldo Ribeiro"]:
     P(n, size=12, align="center", space_after=0)
@@ -606,6 +607,13 @@ for i, t in enumerate(TABLES, 1):
     if fk_list:
         P("Integridade referencial: " + "; ".join(
             f"({', '.join(l)}) referencia {rt}({', '.join(rc)})" for l, rt, rc in fk_list) + ".", size=9, italic=True)
+
+# ---------------------------------------------------------------- parte 3 (projeto fisico)
+# executa os scripts de sql/ em um PostgreSQL local para obter os resultados (ver parte3_docx.py)
+import parte3_docx  # noqa: E402
+doc.add_page_break()
+parte3_docx.add_parte3(doc)
+doc.add_page_break()
 
 # ---------------------------------------------------------------- referencias
 H("Referências", 1)

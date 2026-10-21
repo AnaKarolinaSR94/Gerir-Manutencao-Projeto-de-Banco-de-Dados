@@ -1,0 +1,1086 @@
+-- =====================================================================
+-- Gerir Manutenção (SGM) - Projeto Físico (PostgreSQL)
+-- Script 03: consultas
+-- Executar depois do 01_criacao.sql e do 02_insercao.sql
+--
+-- Data de referencia da carga ("hoje"): 19/10/2026 08:00.
+-- As consultas que dependem de "hoje" usam TIMESTAMP '2026-10-19 08:00' para
+-- que o resultado seja reproduzível; no sistema, troque por now() / CURRENT_DATE.
+--
+-- Parte 1 - consultas de exemplo (SELECT, WHERE, JOIN, GROUP BY, LEFT JOIN)
+-- Parte 2 - consultas de exercício (IN / EXISTS / JOIN, divisão, HAVING, UNION, anti-junção)
+-- Parte 3 - consultas que atendem os requisitos funcionais (RF06 a RF16)
+-- =====================================================================
+SET search_path TO sgm;
+SET
+-- =====================================================================
+-- PARTE 1 - CONSULTAS DE EXEMPLO
+-- =====================================================================
+-- 1.1 todos os equipamentos
+SELECT * FROM equipamento;
+ id_equipamento | codigo |            nome             | fabricante  |  modelo  |  numero_serie  |         localizacao         | criticidade | horimetro_atual | data_aquisicao | ativo | id_linha 
+----------------+--------+-----------------------------+-------------+----------+----------------+-----------------------------+-------------+-----------------+----------------+-------+----------
+              1 | EQ-001 | Torno CNC                   | Romi        | GL 240   | RM-GL240-88213 | Galpao A - Box 1            | ALTA        |          3876.6 | 2019-03-11     | t     |        1
+              2 | EQ-002 | Centro de Usinagem Vertical | Romi        | D 800    | RM-D800-55102  | Galpao A - Box 2            | ALTA        |          6625.6 | 2020-07-02     | t     |        1
+              3 | EQ-003 | Fresadora Ferramenteira     | Diplomat    | FVF 3000 | DP-FVF-30417   | Galpao A - Box 3            | MEDIA       |          3223.1 | 2015-05-20     | t     |        1
+              4 | EQ-004 | Retificadora Plana          | Mello       | P36      | ML-P36-11908   | Galpao A - Box 4            | BAIXA       |          4637.7 | 2012-09-14     | t     |        1
+              5 | EQ-005 | Prensa Hidraulica 250 t     | Schuler     | PH-250   | SC-PH250-77120 | Galpao A - Box 6            | ALTA        |          9189.9 | 2018-02-08     | t     |        2
+              6 | EQ-006 | Prensa Excentrica 80 t      | Jundiai     | PE-80    | JD-PE80-40031  | Galpao A - Box 7            | MEDIA       |          9659.8 | 2014-11-03     | t     |        2
+              7 | EQ-007 | Guilhotina Hidraulica       | Newton      | GHN 3006 | NW-GHN-90876   | Galpao A - Box 8            | MEDIA       |          8634.8 | 2016-04-25     | t     |        2
+              8 | EQ-008 | Cabine de Pintura           | Eisenmann   | CP-4000  | EI-CP4000-2231 | Galpao B - Setor 1          | ALTA        |          5584.7 | 2021-01-19     | t     |        3
+              9 | EQ-009 | Estufa de Cura              | Eisenmann   | EC-220   | EI-EC220-2290  | Galpao B - Setor 2          | MEDIA       |          1235.2 | 2021-01-19     | t     |        3
+             10 | EQ-010 | Compressor de Ar Parafuso   | Atlas Copco | GA 37    | AC-GA37-61544  | Galpao B - Casa de Maquinas | ALTA        |          3572.8 | 2017-08-30     | t     |        3
+             11 | EQ-011 | Esteira Transportadora      | Transmaq    | ET-12    | TM-ET12-33019  | Galpao C - Linha principal  | MEDIA       |          3555.5 | 2019-10-07     | t     |        4
+             12 | EQ-012 | Robo de Solda               | ABB         | IRB 2600 | ABB-2600-77810 | Galpao C - Celula 1         | ALTA        |          6607.1 | 2022-06-13     | t     |        4
+             13 | EQ-013 | Seladora Automatica         | Selamaq     | SA-500   | SM-SA500-10288 | Galpao C - Embalagem        | BAIXA       |          2789.4 | 2020-03-03     | t     |        4
+             14 | EQ-014 | Empilhadeira Eletrica       | Toyota      | 8FBE20   | TY-8FBE-55419  | Galpao C - Expedicao        | BAIXA       |          8482.1 | 2023-02-27     | t     |        4
+             15 | EQ-015 | Furadeira de Coluna         | Kone        | KFC-32   | KN-KFC32-01002 | Galpao A - Deposito         | BAIXA       |           988.0 | 2008-06-01     | f     |        1
+(15 rows)
+
+-- 1.2 equipamentos da linha 1
+SELECT * FROM equipamento WHERE id_linha = 1;
+ id_equipamento | codigo |            nome             | fabricante |  modelo  |  numero_serie  |     localizacao     | criticidade | horimetro_atual | data_aquisicao | ativo | id_linha 
+----------------+--------+-----------------------------+------------+----------+----------------+---------------------+-------------+-----------------+----------------+-------+----------
+              1 | EQ-001 | Torno CNC                   | Romi       | GL 240   | RM-GL240-88213 | Galpao A - Box 1    | ALTA        |          3876.6 | 2019-03-11     | t     |        1
+              2 | EQ-002 | Centro de Usinagem Vertical | Romi       | D 800    | RM-D800-55102  | Galpao A - Box 2    | ALTA        |          6625.6 | 2020-07-02     | t     |        1
+              3 | EQ-003 | Fresadora Ferramenteira     | Diplomat   | FVF 3000 | DP-FVF-30417   | Galpao A - Box 3    | MEDIA       |          3223.1 | 2015-05-20     | t     |        1
+              4 | EQ-004 | Retificadora Plana          | Mello      | P36      | ML-P36-11908   | Galpao A - Box 4    | BAIXA       |          4637.7 | 2012-09-14     | t     |        1
+             15 | EQ-015 | Furadeira de Coluna         | Kone       | KFC-32   | KN-KFC32-01002 | Galpao A - Deposito | BAIXA       |           988.0 | 2008-06-01     | f     |        1
+(5 rows)
+
+-- 1.3 equipamentos das linhas 1 e 2
+SELECT codigo, nome, id_linha FROM equipamento WHERE id_linha IN (1, 2);
+ codigo |            nome             | id_linha 
+--------+-----------------------------+----------
+ EQ-001 | Torno CNC                   |        1
+ EQ-002 | Centro de Usinagem Vertical |        1
+ EQ-003 | Fresadora Ferramenteira     |        1
+ EQ-004 | Retificadora Plana          |        1
+ EQ-005 | Prensa Hidraulica 250 t     |        2
+ EQ-006 | Prensa Excentrica 80 t      |        2
+ EQ-007 | Guilhotina Hidraulica       |        2
+ EQ-015 | Furadeira de Coluna         |        1
+(8 rows)
+
+-- 1.4 equipamentos de criticidade ALTA ainda em operação
+SELECT codigo, nome, criticidade FROM equipamento WHERE criticidade = 'ALTA' AND ativo;
+ codigo |            nome             | criticidade 
+--------+-----------------------------+-------------
+ EQ-001 | Torno CNC                   | ALTA
+ EQ-002 | Centro de Usinagem Vertical | ALTA
+ EQ-005 | Prensa Hidraulica 250 t     | ALTA
+ EQ-008 | Cabine de Pintura           | ALTA
+ EQ-010 | Compressor de Ar Parafuso   | ALTA
+ EQ-012 | Robo de Solda               | ALTA
+(6 rows)
+
+-- 1.5 usuários sem telefone cadastrado
+SELECT nome, login, tipo_usuario FROM usuario WHERE telefone IS NULL;
+          nome          |      login      | tipo_usuario 
+------------------------+-----------------+--------------
+ Lucas Gabriel Moreira  | lucas.moreira   | T
+ Rodrigo Mendes Freitas | rodrigo.freitas | T
+(2 rows)
+
+-- 1.6 equipamentos cujo nome começa com "Prensa"
+SELECT codigo, nome, modelo FROM equipamento WHERE nome LIKE 'Prensa%';
+ codigo |          nome           | modelo 
+--------+-------------------------+--------
+ EQ-005 | Prensa Hidraulica 250 t | PH-250
+ EQ-006 | Prensa Excentrica 80 t  | PE-80
+(2 rows)
+
+-- 1.7 todos os técnicos com especialidade e equipe (junção na cláusula WHERE)
+SELECT u.nome, t.especialidade, t.id_equipe
+FROM usuario u, tecnico t
+WHERE u.id_usuario = t.id_usuario
+ORDER BY u.nome;
+           nome            | especialidade | id_equipe 
+---------------------------+---------------+-----------
+ Antonio Carlos Silva      | Eletrica      |         1
+ Bruno Cesar Cardoso       | Automacao     |         2
+ Camila Rodrigues Teixeira | Automacao     |         3
+ Diego Araujo Pinto        | Mecanica      |         3
+ Felipe Augusto Castro     | Eletrica      |         3
+ Gustavo Henrique Lopes    | Hidraulica    |         3
+ Joao Batista Ferreira     | Mecanica      |         1
+ Lucas Gabriel Moreira     | Mecanica      |         1
+ Mariana Alves Barbosa     | Eletrica      |         2
+ Pedro Henrique Santos     | Hidraulica    |         1
+ Rodrigo Mendes Freitas    | Pneumatica    |         2
+ Thiago Ribeiro Dias       | Mecanica      |         2
+(12 rows)
+
+-- 1.8 técnicos eletricistas com o nome da equipe (INNER JOIN)
+SELECT u.nome, t.especialidade, e.nome AS equipe
+FROM usuario u
+INNER JOIN tecnico t ON t.id_usuario = u.id_usuario
+INNER JOIN equipe e ON e.id_equipe = t.id_equipe
+WHERE t.especialidade = 'Eletrica';
+         nome          | especialidade |   equipe    
+-----------------------+---------------+-------------
+ Antonio Carlos Silva  | Eletrica      | Equipe Alfa
+ Mariana Alves Barbosa | Eletrica      | Equipe Beta
+ Felipe Augusto Castro | Eletrica      | Equipe Gama
+(3 rows)
+
+-- 1.9 total de ordens de serviço corretivas
+SELECT count(*) AS total_corretivas FROM ordem_servico WHERE tipo_os = 'C';
+ total_corretivas 
+------------------
+               44
+(1 row)
+
+-- 1.10 quantidade de OS por tipo e status
+SELECT tipo_os, status, count(*) AS quantidade
+FROM ordem_servico
+GROUP BY tipo_os, status
+ORDER BY tipo_os, status;
+ tipo_os |        status        | quantidade 
+---------+----------------------+------------
+ C       | AGUARDANDO_APROVACAO |          1
+ C       | CONCLUIDA            |         42
+ C       | EM_EXECUCAO          |          1
+ P       | AGUARDANDO_APROVACAO |          2
+ P       | CONCLUIDA            |         61
+ P       | EM_EXECUCAO          |          4
+ P       | PENDENTE             |          3
+(7 rows)
+
+-- 1.11 fabricantes distintos
+SELECT DISTINCT fabricante FROM equipamento ORDER BY fabricante;
+ fabricante  
+-------------
+ ABB
+ Atlas Copco
+ Diplomat
+ Eisenmann
+ Jundiai
+ Kone
+ Mello
+ Newton
+ Romi
+ Schuler
+ Selamaq
+ Toyota
+ Transmaq
+(13 rows)
+
+-- 1.12 quantidade de equipamentos por linha de produção
+SELECT l.nome AS linha, count(*) AS equipamentos
+FROM linha_producao l JOIN equipamento e ON e.id_linha = l.id_linha
+GROUP BY l.nome
+ORDER BY l.nome;
+             linha              | equipamentos 
+--------------------------------+--------------
+ Linha 1 - Usinagem             |            5
+ Linha 2 - Estamparia           |            3
+ Linha 3 - Pintura              |            3
+ Linha 4 - Montagem e Embalagem |            4
+(4 rows)
+
+-- 1.13 equipamentos com seus planos preventivos (só os que têm plano)
+SELECT e.codigo || ' - ' || e.nome AS equipamento, p.descricao, p.periodicidade
+FROM equipamento e JOIN plano_preventivo p ON p.id_equipamento = e.id_equipamento
+ORDER BY equipamento;
+             equipamento              |                          descricao                           | periodicidade 
+--------------------------------------+--------------------------------------------------------------+---------------
+ EQ-001 - Torno CNC                   | Lubrificacao e inspecao mensal do torno                      | MENSAL
+ EQ-002 - Centro de Usinagem Vertical | Revisao trimestral do centro de usinagem                     | TRIMESTRAL
+ EQ-003 - Fresadora Ferramenteira     | Inspecao mensal da fresadora                                 | MENSAL
+ EQ-004 - Retificadora Plana          | Revisao semestral da retificadora                            | SEMESTRAL
+ EQ-005 - Prensa Hidraulica 250 t     | Inspecao mensal do sistema hidraulico da prensa              | MENSAL
+ EQ-005 - Prensa Hidraulica 250 t     | Revisao anual completa da prensa hidraulica                  | ANUAL
+ EQ-006 - Prensa Excentrica 80 t      | Lubrificacao mensal da prensa excentrica                     | MENSAL
+ EQ-007 - Guilhotina Hidraulica       | Inspecao trimestral da guilhotina                            | TRIMESTRAL
+ EQ-008 - Cabine de Pintura           | Troca de filtros da cabine de pintura                        | MENSAL
+ EQ-009 - Estufa de Cura              | Inspecao trimestral da estufa                                | TRIMESTRAL
+ EQ-010 - Compressor de Ar Parafuso   | Drenagem e inspecao mensal do compressor                     | MENSAL
+ EQ-011 - Esteira Transportadora      | Inspecao mensal da esteira                                   | MENSAL
+ EQ-012 - Robo de Solda               | Manutencao mensal do robo de solda                           | MENSAL
+ EQ-013 - Seladora Automatica         | Inspecao trimestral da seladora                              | TRIMESTRAL
+ EQ-014 - Empilhadeira Eletrica       | Revisao trimestral da empilhadeira                           | TRIMESTRAL
+ EQ-015 - Furadeira de Coluna         | Lubrificacao semestral da furadeira (equipamento desativado) | SEMESTRAL
+(16 rows)
+
+-- 1.14 todas as peças e, para as que foram usadas, o total baixado (LEFT JOIN)
+SELECT p.codigo, p.descricao, coalesce(sum(b.quantidade), 0) AS total_baixado
+FROM peca p LEFT JOIN baixa_peca b ON b.id_peca = p.id_peca
+GROUP BY p.id_peca, p.codigo, p.descricao
+ORDER BY total_baixado DESC;
+   codigo    |                   descricao                    | total_baixado 
+-------------+------------------------------------------------+---------------
+ PC-OLH-68   | Oleo hidraulico ISO VG 68                      |           166
+ PC-SEN-IND  | Sensor indutivo M18 PNP                        |            42
+ PC-ROL-6205 | Rolamento rigido de esferas 6205-2RS           |            38
+ PC-GRX-EP2  | Graxa de litio EP2                             |            31
+ PC-CON-24V  | Contator tripolar 24 Vcc 18 A                  |            27
+ PC-FUS-10A  | Fusivel NH 10 A                                |            22
+ PC-COR-A42  | Correia em V perfil A-42                       |            15
+ PC-MAN-HID  | Mangueira hidraulica 1/2 pol. (metro)          |            12
+ PC-FIL-CAB  | Filtro de teto para cabine de pintura          |            11
+ PC-FIL-AR37 | Elemento filtrante de ar para compressor GA 37 |             8
+ PC-BIC-SOL  | Bico de contato para tocha de solda 1,2 mm     |             7
+ PC-RES-SEL  | Resistencia de selagem 500 mm                  |             5
+ PC-RET-H60  | Kit de vedacao para cilindro hidraulico 60 mm  |             3
+ PC-BAT-48V  | Bateria tracionaria 48 V                       |             0
+ PC-LAM-GUI  | Jogo de laminas para guilhotina 3 m            |             0
+(15 rows)
+
+-- =====================================================================
+-- PARTE 2 - CONSULTAS DE EXERCICIO
+-- =====================================================================
+-- 2.1 nome e telefone de todos os técnicos da Equipe Beta
+SELECT u.nome, u.telefone
+FROM usuario u
+JOIN tecnico t ON t.id_usuario = u.id_usuario
+JOIN equipe e ON e.id_equipe = t.id_equipe
+WHERE e.nome = 'Equipe Beta';
+          nome          |    telefone     
+------------------------+-----------------
+ Mariana Alves Barbosa  | (62) 99810-1013
+ Thiago Ribeiro Dias    | (62) 99810-1014
+ Bruno Cesar Cardoso    | (62) 99810-1015
+ Rodrigo Mendes Freitas | 
+(4 rows)
+
+-- 2.2 equipe, turno, supervisor e técnicos (nome e especialidade) de todas as equipes
+SELECT e.nome AS equipe, e.turno, us.nome AS supervisor, ut.nome AS tecnico, t.especialidade
+FROM equipe e
+JOIN usuario us ON us.id_usuario = e.id_supervisor
+JOIN tecnico t ON t.id_equipe = e.id_equipe
+JOIN usuario ut ON ut.id_usuario = t.id_usuario
+ORDER BY e.nome, ut.nome;
+   equipe    | turno |      supervisor       |          tecnico          | especialidade 
+-------------+-------+-----------------------+---------------------------+---------------
+ Equipe Alfa | Manha | Fernanda Souza Lima   | Antonio Carlos Silva      | Eletrica
+ Equipe Alfa | Manha | Fernanda Souza Lima   | Joao Batista Ferreira     | Mecanica
+ Equipe Alfa | Manha | Fernanda Souza Lima   | Lucas Gabriel Moreira     | Mecanica
+ Equipe Alfa | Manha | Fernanda Souza Lima   | Pedro Henrique Santos     | Hidraulica
+ Equipe Beta | Tarde | Carlos Eduardo Ramos  | Bruno Cesar Cardoso       | Automacao
+ Equipe Beta | Tarde | Carlos Eduardo Ramos  | Mariana Alves Barbosa     | Eletrica
+ Equipe Beta | Tarde | Carlos Eduardo Ramos  | Rodrigo Mendes Freitas    | Pneumatica
+ Equipe Beta | Tarde | Carlos Eduardo Ramos  | Thiago Ribeiro Dias       | Mecanica
+ Equipe Gama | Noite | Juliana Pereira Costa | Camila Rodrigues Teixeira | Automacao
+ Equipe Gama | Noite | Juliana Pereira Costa | Diego Araujo Pinto        | Mecanica
+ Equipe Gama | Noite | Juliana Pereira Costa | Felipe Augusto Castro     | Eletrica
+ Equipe Gama | Noite | Juliana Pereira Costa | Gustavo Henrique Lopes    | Hidraulica
+(12 rows)
+
+-- 2.3 todas as linhas de produção (todos os dados) com os dados de seus equipamentos
+SELECT l.*, e.codigo, e.nome AS equipamento, e.criticidade, e.ativo
+FROM linha_producao l JOIN equipamento e ON e.id_linha = l.id_linha
+ORDER BY l.id_linha, e.codigo;
+ id_linha |              nome              |  setor   | codigo |         equipamento         | criticidade | ativo 
+----------+--------------------------------+----------+--------+-----------------------------+-------------+-------
+        1 | Linha 1 - Usinagem             | Galpao A | EQ-001 | Torno CNC                   | ALTA        | t
+        1 | Linha 1 - Usinagem             | Galpao A | EQ-002 | Centro de Usinagem Vertical | ALTA        | t
+        1 | Linha 1 - Usinagem             | Galpao A | EQ-003 | Fresadora Ferramenteira     | MEDIA       | t
+        1 | Linha 1 - Usinagem             | Galpao A | EQ-004 | Retificadora Plana          | BAIXA       | t
+        1 | Linha 1 - Usinagem             | Galpao A | EQ-015 | Furadeira de Coluna         | BAIXA       | f
+        2 | Linha 2 - Estamparia           | Galpao A | EQ-005 | Prensa Hidraulica 250 t     | ALTA        | t
+        2 | Linha 2 - Estamparia           | Galpao A | EQ-006 | Prensa Excentrica 80 t      | MEDIA       | t
+        2 | Linha 2 - Estamparia           | Galpao A | EQ-007 | Guilhotina Hidraulica       | MEDIA       | t
+        3 | Linha 3 - Pintura              | Galpao B | EQ-008 | Cabine de Pintura           | ALTA        | t
+        3 | Linha 3 - Pintura              | Galpao B | EQ-009 | Estufa de Cura              | MEDIA       | t
+        3 | Linha 3 - Pintura              | Galpao B | EQ-010 | Compressor de Ar Parafuso   | ALTA        | t
+        4 | Linha 4 - Montagem e Embalagem | Galpao C | EQ-011 | Esteira Transportadora      | MEDIA       | t
+        4 | Linha 4 - Montagem e Embalagem | Galpao C | EQ-012 | Robo de Solda               | ALTA        | t
+        4 | Linha 4 - Montagem e Embalagem | Galpao C | EQ-013 | Seladora Automatica         | BAIXA       | t
+        4 | Linha 4 - Montagem e Embalagem | Galpao C | EQ-014 | Empilhadeira Eletrica       | BAIXA       | t
+(15 rows)
+
+-- 2.4 técnicos (nomes) que fizeram corretivas na Prensa Hidraulica (EQ-005):
+--     código da OS, data da falha, horímetro e causa
+SELECT u.nome AS tecnico, o.codigo_os, c.data_hora_falha, o.leitura_horimetro, c.causa_falha
+FROM ordem_servico o
+JOIN manutencao_corretiva c ON c.codigo_os = o.codigo_os
+JOIN equipamento e ON e.id_equipamento = o.id_equipamento
+JOIN usuario u ON u.id_usuario = o.id_tecnico
+WHERE e.codigo = 'EQ-005'
+ORDER BY c.data_hora_falha;
+        tecnico        | codigo_os |   data_hora_falha   | leitura_horimetro |          causa_falha           
+-----------------------+-----------+---------------------+-------------------+--------------------------------
+ Joao Batista Ferreira |        12 | 2026-04-26 14:22:00 |            7833.5 | Sensor da cortina desalinhado
+ Thiago Ribeiro Dias   |        20 | 2026-05-05 17:19:00 |            8009.7 | Vedacao do cilindro danificada
+ Thiago Ribeiro Dias   |        23 | 2026-05-15 06:43:00 |            8078.9 | Sensor da cortina desalinhado
+ Mariana Alves Barbosa |        25 | 2026-05-15 17:10:00 |            8153.6 | Sensor da cortina desalinhado
+ Thiago Ribeiro Dias   |        52 | 2026-07-08 05:52:00 |            8369.6 | Vedacao do cilindro danificada
+ Joao Batista Ferreira |        71 | 2026-08-09 08:42:00 |            8576.3 | Vedacao do cilindro danificada
+ Bruno Cesar Cardoso   |        80 | 2026-09-01 04:43:00 |            8795.8 | Sensor da cortina desalinhado
+ Mariana Alves Barbosa |        83 | 2026-09-03 07:29:00 |            8932.1 | Sensor da cortina desalinhado
+ Mariana Alves Barbosa |        84 | 2026-09-06 03:55:00 |            9023.6 | Sensor da cortina desalinhado
+ Mariana Alves Barbosa |        99 | 2026-09-25 01:58:00 |            9189.9 | Mangueira hidraulica rompida
+(10 rows)
+
+-- 2.5 supervisores com os registros profissionais e as OS que avaliaram em outubro de 2026
+SELECT u.nome AS supervisor, s.registro_profissional, o.codigo_os, o.decisao_avaliacao, o.data_avaliacao
+FROM supervisor s
+JOIN usuario u ON u.id_usuario = s.id_usuario
+JOIN ordem_servico o ON o.id_supervisor_avaliador = s.id_usuario
+WHERE o.data_avaliacao >= DATE '2026-10-01'
+ORDER BY u.nome, o.data_avaliacao;
+      supervisor       | registro_profissional | codigo_os | decisao_avaliacao |   data_avaliacao    
+-----------------------+-----------------------+-----------+-------------------+---------------------
+ Carlos Eduardo Ramos  | CREA-GO 1020304777    |       103 | APROVADA          | 2026-10-05 17:23:00
+ Fernanda Souza Lima   | CREA-GO 1020304050    |       104 | REJEITADA         | 2026-10-04 21:27:00
+ Fernanda Souza Lima   | CREA-GO 1020304050    |       105 | REJEITADA         | 2026-10-06 20:52:00
+ Juliana Pereira Costa |                       |       102 | APROVADA          | 2026-10-01 04:48:00
+(4 rows)
+
+-- 2.6 técnicos (nomes) que fizeram OS em equipamentos da Linha 1 - Usinagem e que nunca atenderam
+--     uma corretiva com parada de produção (código da OS, equipamento e data de início)
+SELECT u.nome AS tecnico, o.codigo_os, e.codigo, e.nome AS equipamento, o.data_inicio_execucao
+FROM ordem_servico o
+JOIN equipamento e ON e.id_equipamento = o.id_equipamento
+JOIN linha_producao l ON l.id_linha = e.id_linha
+JOIN usuario u ON u.id_usuario = o.id_tecnico
+WHERE l.nome = 'Linha 1 - Usinagem'
+  AND NOT EXISTS (SELECT 1 FROM ordem_servico o2 JOIN manutencao_corretiva c ON c.codigo_os = o2.codigo_os
+                  WHERE o2.id_tecnico = o.id_tecnico AND c.impacto_producao)
+ORDER BY u.nome, o.data_inicio_execucao;
+        tecnico        | codigo_os | codigo |       equipamento       | data_inicio_execucao 
+-----------------------+-----------+--------+-------------------------+----------------------
+ Pedro Henrique Santos |         9 | EQ-003 | Fresadora Ferramenteira | 2026-04-22 07:00:00
+ Pedro Henrique Santos |        28 | EQ-001 | Torno CNC               | 2026-05-18 09:21:00
+ Pedro Henrique Santos |        30 | EQ-003 | Fresadora Ferramenteira | 2026-05-23 07:00:00
+ Pedro Henrique Santos |        46 | EQ-001 | Torno CNC               | 2026-06-22 07:10:00
+ Pedro Henrique Santos |        95 | EQ-003 | Fresadora Ferramenteira | 2026-09-16 09:00:00
+(5 rows)
+
+-- 2.7 dados dos equipamentos que já tiveram falha com parada de produção
+--     resolvida de três formas: IN, EXISTS e JOIN (as três devem trazer o mesmo resultado)
+-- (a) usando IN
+SELECT * FROM equipamento
+WHERE id_equipamento IN (SELECT o.id_equipamento
+                         FROM ordem_servico o JOIN manutencao_corretiva c ON c.codigo_os = o.codigo_os
+                         WHERE c.impacto_producao)
+ORDER BY codigo;
+ id_equipamento | codigo |            nome             | fabricante  |  modelo  |  numero_serie  |         localizacao         | criticidade | horimetro_atual | data_aquisicao | ativo | id_linha 
+----------------+--------+-----------------------------+-------------+----------+----------------+-----------------------------+-------------+-----------------+----------------+-------+----------
+              1 | EQ-001 | Torno CNC                   | Romi        | GL 240   | RM-GL240-88213 | Galpao A - Box 1            | ALTA        |          3876.6 | 2019-03-11     | t     |        1
+              2 | EQ-002 | Centro de Usinagem Vertical | Romi        | D 800    | RM-D800-55102  | Galpao A - Box 2            | ALTA        |          6625.6 | 2020-07-02     | t     |        1
+              3 | EQ-003 | Fresadora Ferramenteira     | Diplomat    | FVF 3000 | DP-FVF-30417   | Galpao A - Box 3            | MEDIA       |          3223.1 | 2015-05-20     | t     |        1
+              4 | EQ-004 | Retificadora Plana          | Mello       | P36      | ML-P36-11908   | Galpao A - Box 4            | BAIXA       |          4637.7 | 2012-09-14     | t     |        1
+              5 | EQ-005 | Prensa Hidraulica 250 t     | Schuler     | PH-250   | SC-PH250-77120 | Galpao A - Box 6            | ALTA        |          9189.9 | 2018-02-08     | t     |        2
+              7 | EQ-007 | Guilhotina Hidraulica       | Newton      | GHN 3006 | NW-GHN-90876   | Galpao A - Box 8            | MEDIA       |          8634.8 | 2016-04-25     | t     |        2
+              8 | EQ-008 | Cabine de Pintura           | Eisenmann   | CP-4000  | EI-CP4000-2231 | Galpao B - Setor 1          | ALTA        |          5584.7 | 2021-01-19     | t     |        3
+             10 | EQ-010 | Compressor de Ar Parafuso   | Atlas Copco | GA 37    | AC-GA37-61544  | Galpao B - Casa de Maquinas | ALTA        |          3572.8 | 2017-08-30     | t     |        3
+             11 | EQ-011 | Esteira Transportadora      | Transmaq    | ET-12    | TM-ET12-33019  | Galpao C - Linha principal  | MEDIA       |          3555.5 | 2019-10-07     | t     |        4
+             12 | EQ-012 | Robo de Solda               | ABB         | IRB 2600 | ABB-2600-77810 | Galpao C - Celula 1         | ALTA        |          6607.1 | 2022-06-13     | t     |        4
+             14 | EQ-014 | Empilhadeira Eletrica       | Toyota      | 8FBE20   | TY-8FBE-55419  | Galpao C - Expedicao        | BAIXA       |          8482.1 | 2023-02-27     | t     |        4
+(11 rows)
+
+-- (b) usando EXISTS
+SELECT * FROM equipamento e
+WHERE EXISTS (SELECT 1
+              FROM ordem_servico o JOIN manutencao_corretiva c ON c.codigo_os = o.codigo_os
+              WHERE o.id_equipamento = e.id_equipamento AND c.impacto_producao)
+ORDER BY codigo;
+ id_equipamento | codigo |            nome             | fabricante  |  modelo  |  numero_serie  |         localizacao         | criticidade | horimetro_atual | data_aquisicao | ativo | id_linha 
+----------------+--------+-----------------------------+-------------+----------+----------------+-----------------------------+-------------+-----------------+----------------+-------+----------
+              1 | EQ-001 | Torno CNC                   | Romi        | GL 240   | RM-GL240-88213 | Galpao A - Box 1            | ALTA        |          3876.6 | 2019-03-11     | t     |        1
+              2 | EQ-002 | Centro de Usinagem Vertical | Romi        | D 800    | RM-D800-55102  | Galpao A - Box 2            | ALTA        |          6625.6 | 2020-07-02     | t     |        1
+              3 | EQ-003 | Fresadora Ferramenteira     | Diplomat    | FVF 3000 | DP-FVF-30417   | Galpao A - Box 3            | MEDIA       |          3223.1 | 2015-05-20     | t     |        1
+              4 | EQ-004 | Retificadora Plana          | Mello       | P36      | ML-P36-11908   | Galpao A - Box 4            | BAIXA       |          4637.7 | 2012-09-14     | t     |        1
+              5 | EQ-005 | Prensa Hidraulica 250 t     | Schuler     | PH-250   | SC-PH250-77120 | Galpao A - Box 6            | ALTA        |          9189.9 | 2018-02-08     | t     |        2
+              7 | EQ-007 | Guilhotina Hidraulica       | Newton      | GHN 3006 | NW-GHN-90876   | Galpao A - Box 8            | MEDIA       |          8634.8 | 2016-04-25     | t     |        2
+              8 | EQ-008 | Cabine de Pintura           | Eisenmann   | CP-4000  | EI-CP4000-2231 | Galpao B - Setor 1          | ALTA        |          5584.7 | 2021-01-19     | t     |        3
+             10 | EQ-010 | Compressor de Ar Parafuso   | Atlas Copco | GA 37    | AC-GA37-61544  | Galpao B - Casa de Maquinas | ALTA        |          3572.8 | 2017-08-30     | t     |        3
+             11 | EQ-011 | Esteira Transportadora      | Transmaq    | ET-12    | TM-ET12-33019  | Galpao C - Linha principal  | MEDIA       |          3555.5 | 2019-10-07     | t     |        4
+             12 | EQ-012 | Robo de Solda               | ABB         | IRB 2600 | ABB-2600-77810 | Galpao C - Celula 1         | ALTA        |          6607.1 | 2022-06-13     | t     |        4
+             14 | EQ-014 | Empilhadeira Eletrica       | Toyota      | 8FBE20   | TY-8FBE-55419  | Galpao C - Expedicao        | BAIXA       |          8482.1 | 2023-02-27     | t     |        4
+(11 rows)
+
+-- (c) usando JOIN
+SELECT DISTINCT e.*
+FROM equipamento e
+JOIN ordem_servico o ON o.id_equipamento = e.id_equipamento
+JOIN manutencao_corretiva c ON c.codigo_os = o.codigo_os
+WHERE c.impacto_producao
+ORDER BY e.codigo;
+ id_equipamento | codigo |            nome             | fabricante  |  modelo  |  numero_serie  |         localizacao         | criticidade | horimetro_atual | data_aquisicao | ativo | id_linha 
+----------------+--------+-----------------------------+-------------+----------+----------------+-----------------------------+-------------+-----------------+----------------+-------+----------
+              1 | EQ-001 | Torno CNC                   | Romi        | GL 240   | RM-GL240-88213 | Galpao A - Box 1            | ALTA        |          3876.6 | 2019-03-11     | t     |        1
+              2 | EQ-002 | Centro de Usinagem Vertical | Romi        | D 800    | RM-D800-55102  | Galpao A - Box 2            | ALTA        |          6625.6 | 2020-07-02     | t     |        1
+              3 | EQ-003 | Fresadora Ferramenteira     | Diplomat    | FVF 3000 | DP-FVF-30417   | Galpao A - Box 3            | MEDIA       |          3223.1 | 2015-05-20     | t     |        1
+              4 | EQ-004 | Retificadora Plana          | Mello       | P36      | ML-P36-11908   | Galpao A - Box 4            | BAIXA       |          4637.7 | 2012-09-14     | t     |        1
+              5 | EQ-005 | Prensa Hidraulica 250 t     | Schuler     | PH-250   | SC-PH250-77120 | Galpao A - Box 6            | ALTA        |          9189.9 | 2018-02-08     | t     |        2
+              7 | EQ-007 | Guilhotina Hidraulica       | Newton      | GHN 3006 | NW-GHN-90876   | Galpao A - Box 8            | MEDIA       |          8634.8 | 2016-04-25     | t     |        2
+              8 | EQ-008 | Cabine de Pintura           | Eisenmann   | CP-4000  | EI-CP4000-2231 | Galpao B - Setor 1          | ALTA        |          5584.7 | 2021-01-19     | t     |        3
+             10 | EQ-010 | Compressor de Ar Parafuso   | Atlas Copco | GA 37    | AC-GA37-61544  | Galpao B - Casa de Maquinas | ALTA        |          3572.8 | 2017-08-30     | t     |        3
+             11 | EQ-011 | Esteira Transportadora      | Transmaq    | ET-12    | TM-ET12-33019  | Galpao C - Linha principal  | MEDIA       |          3555.5 | 2019-10-07     | t     |        4
+             12 | EQ-012 | Robo de Solda               | ABB         | IRB 2600 | ABB-2600-77810 | Galpao C - Celula 1         | ALTA        |          6607.1 | 2022-06-13     | t     |        4
+             14 | EQ-014 | Empilhadeira Eletrica       | Toyota      | 8FBE20   | TY-8FBE-55419  | Galpao C - Expedicao        | BAIXA       |          8482.1 | 2023-02-27     | t     |        4
+(11 rows)
+
+-- 2.8 DIVISÃO: nome dos técnicos que atenderam TODOS os equipamentos que o técnico
+--     Bruno Cesar Cardoso atendeu (EQ-005, EQ-006, EQ-007 e EQ-008).
+--     Resposta esperada com a carga original: Thiago Ribeiro Dias
+SELECT u.nome
+FROM tecnico t JOIN usuario u ON u.id_usuario = t.id_usuario
+WHERE u.nome <> 'Bruno Cesar Cardoso'
+  AND NOT EXISTS (
+      SELECT o.id_equipamento FROM ordem_servico o JOIN usuario b ON b.id_usuario = o.id_tecnico
+      WHERE b.nome = 'Bruno Cesar Cardoso'
+      EXCEPT
+      SELECT o.id_equipamento FROM ordem_servico o WHERE o.id_tecnico = t.id_usuario);
+        nome         
+---------------------
+ Thiago Ribeiro Dias
+(1 row)
+
+-- 2.8 (b) mesma divisão com NOT EXISTS duplo (forma clássica, sem EXCEPT)
+SELECT u.nome
+FROM tecnico t JOIN usuario u ON u.id_usuario = t.id_usuario
+WHERE u.nome <> 'Bruno Cesar Cardoso'
+  AND NOT EXISTS (
+      SELECT 1 FROM ordem_servico ob JOIN usuario b ON b.id_usuario = ob.id_tecnico
+      WHERE b.nome = 'Bruno Cesar Cardoso'
+        AND NOT EXISTS (SELECT 1 FROM ordem_servico ot
+                        WHERE ot.id_tecnico = t.id_usuario AND ot.id_equipamento = ob.id_equipamento));
+        nome         
+---------------------
+ Thiago Ribeiro Dias
+(1 row)
+
+-- Experimento: dentro de uma transação, a Mariana passa a atender a Guilhotina (EQ-007)
+-- e também passa a cobrir todos os equipamentos do Bruno. Resposta: Mariana Alves Barbosa; Thiago Ribeiro Dias
+BEGIN;
+BEGIN
+INSERT INTO ordem_servico (tipo_os, descricao, data_abertura, prioridade, status, id_equipamento, id_tecnico)
+VALUES ('C', 'OS de teste da consulta de divisao', TIMESTAMP '2026-10-19 08:00', 'BAIXA', 'PENDENTE', 7, 13);
+INSERT 0 1
+SELECT u.nome
+FROM tecnico t JOIN usuario u ON u.id_usuario = t.id_usuario
+WHERE u.nome <> 'Bruno Cesar Cardoso'
+  AND NOT EXISTS (
+      SELECT o.id_equipamento FROM ordem_servico o JOIN usuario b ON b.id_usuario = o.id_tecnico
+      WHERE b.nome = 'Bruno Cesar Cardoso'
+      EXCEPT
+      SELECT o.id_equipamento FROM ordem_servico o WHERE o.id_tecnico = t.id_usuario)
+ORDER BY u.nome;
+         nome          
+-----------------------
+ Mariana Alves Barbosa
+ Thiago Ribeiro Dias
+(2 rows)
+
+ROLLBACK;
+ROLLBACK
+-- 2.9 código, nome e quantidade de corretivas dos equipamentos de criticidade ALTA
+--     que tiveram mais de 3 corretivas
+SELECT e.codigo, e.nome, count(*) AS corretivas
+FROM equipamento e JOIN ordem_servico o ON o.id_equipamento = e.id_equipamento
+WHERE e.criticidade = 'ALTA' AND o.tipo_os = 'C'
+GROUP BY e.codigo, e.nome
+HAVING count(*) > 3
+ORDER BY corretivas DESC;
+ codigo |            nome             | corretivas 
+--------+-----------------------------+------------
+ EQ-005 | Prensa Hidraulica 250 t     |         10
+ EQ-010 | Compressor de Ar Parafuso   |          6
+ EQ-001 | Torno CNC                   |          4
+ EQ-002 | Centro de Usinagem Vertical |          4
+ EQ-012 | Robo de Solda               |          4
+(5 rows)
+
+-- 2.10 nome e especialidade dos técnicos com mais de 10 OS concluídas
+SELECT u.nome, t.especialidade, count(*) AS concluidas
+FROM tecnico t
+JOIN usuario u ON u.id_usuario = t.id_usuario
+JOIN ordem_servico o ON o.id_tecnico = t.id_usuario
+WHERE o.status = 'CONCLUIDA'
+GROUP BY u.nome, t.especialidade
+HAVING count(*) > 10
+ORDER BY concluidas DESC;
+           nome            | especialidade | concluidas 
+---------------------------+---------------+------------
+ Camila Rodrigues Teixeira | Automacao     |         16
+ Thiago Ribeiro Dias       | Mecanica      |         13
+ Bruno Cesar Cardoso       | Automacao     |         11
+ Diego Araujo Pinto        | Mecanica      |         11
+(4 rows)
+
+-- 2.11 nome e perfil de todas as pessoas cadastradas; para técnico, mostra também a equipe,
+--      e para supervisor, a equipe que lidera
+--      ex.:  Joao Batista Ferreira - Técnico da Equipe Alfa
+--            Fernanda Souza Lima   - Supervisor(a) da Equipe Alfa
+SELECT u.nome || ' - Tecnico da ' || e.nome AS pessoa
+FROM usuario u JOIN tecnico t ON t.id_usuario = u.id_usuario JOIN equipe e ON e.id_equipe = t.id_equipe
+UNION
+SELECT u.nome || ' - Supervisor(a) da ' || coalesce(e.nome, 'nenhuma equipe')
+FROM usuario u JOIN supervisor s ON s.id_usuario = u.id_usuario LEFT JOIN equipe e ON e.id_supervisor = s.id_usuario
+UNION
+SELECT u.nome || ' - Gestor(a): ' || coalesce(g.cargo, 'sem cargo')
+FROM usuario u JOIN gestor g ON g.id_usuario = u.id_usuario
+UNION
+SELECT u.nome || ' - Administrativo(a): ' || coalesce(a.setor, 'sem setor')
+FROM usuario u JOIN administrativo a ON a.id_usuario = u.id_usuario
+UNION
+SELECT u.nome || ' - Administrador(a) do Sistema'
+FROM usuario u JOIN administrador_sistema x ON x.id_usuario = u.id_usuario
+ORDER BY 1;
+                                      pessoa                                      
+----------------------------------------------------------------------------------
+ Antonio Carlos Silva - Tecnico da Equipe Alfa
+ Bruno Cesar Cardoso - Tecnico da Equipe Beta
+ Camila Rodrigues Teixeira - Tecnico da Equipe Gama
+ Carlos Eduardo Ramos - Supervisor(a) da Equipe Beta
+ Diego Araujo Pinto - Tecnico da Equipe Gama
+ Felipe Augusto Castro - Tecnico da Equipe Gama
+ Fernanda Souza Lima - Supervisor(a) da Equipe Alfa
+ Gustavo Henrique Lopes - Tecnico da Equipe Gama
+ Joao Batista Ferreira - Tecnico da Equipe Alfa
+ Juliana Pereira Costa - Supervisor(a) da Equipe Gama
+ Lucas Gabriel Moreira - Tecnico da Equipe Alfa
+ Luciana Martins Rocha - Administrativo(a): Almoxarifado
+ Marcos Vinicius Teles - Gestor(a): Gerente Industrial
+ Mariana Alves Barbosa - Tecnico da Equipe Beta
+ Patricia Gomes Andrade - Gestor(a): Diretora de Operacoes
+ Pedro Henrique Santos - Tecnico da Equipe Alfa
+ Rafael Oliveira Nunes - Administrativo(a): Planejamento e Controle da Manutencao
+ Ricardo Almeida Prado - Administrador(a) do Sistema
+ Rodrigo Mendes Freitas - Tecnico da Equipe Beta
+ Thiago Ribeiro Dias - Tecnico da Equipe Beta
+(20 rows)
+
+-- 2.12 nome dos técnicos que nunca receberam nenhuma OS
+SELECT u.nome, u.data_cadastro
+FROM tecnico t JOIN usuario u ON u.id_usuario = t.id_usuario
+LEFT JOIN ordem_servico o ON o.id_tecnico = t.id_usuario
+WHERE o.codigo_os IS NULL;
+          nome          |    data_cadastro    
+------------------------+---------------------
+ Gustavo Henrique Lopes | 2026-10-13 22:00:00
+(1 row)
+
+-- 2.13 código e descrição das peças que nunca foram usadas em nenhuma OS
+SELECT p.codigo, p.descricao, p.quantidade_atual
+FROM peca p
+WHERE NOT EXISTS (SELECT 1 FROM baixa_peca b WHERE b.id_peca = p.id_peca);
+   codigo   |              descricao              | quantidade_atual 
+------------+-------------------------------------+------------------
+ PC-BAT-48V | Bateria tracionaria 48 V            |                2
+ PC-LAM-GUI | Jogo de laminas para guilhotina 3 m |                2
+(2 rows)
+
+-- 2.14 equipamentos sem nenhum plano preventivo ativo (e se o equipamento ainda opera)
+SELECT e.codigo, e.nome, e.ativo AS equipamento_ativo
+FROM equipamento e
+WHERE e.id_equipamento NOT IN (SELECT id_equipamento FROM plano_preventivo WHERE ativo);
+ codigo |        nome         | equipamento_ativo 
+--------+---------------------+-------------------
+ EQ-015 | Furadeira de Coluna | f
+(1 row)
+
+-- 2.15 nome, especialidade e equipe dos técnicos que atenderam mais de 5 equipamentos diferentes
+SELECT u.nome, t.especialidade, e.nome AS equipe, count(DISTINCT o.id_equipamento) AS equipamentos
+FROM tecnico t
+JOIN usuario u ON u.id_usuario = t.id_usuario
+JOIN equipe e ON e.id_equipe = t.id_equipe
+JOIN ordem_servico o ON o.id_tecnico = t.id_usuario
+GROUP BY u.nome, t.especialidade, e.nome
+HAVING count(DISTINCT o.id_equipamento) > 5
+ORDER BY equipamentos DESC;
+           nome            | especialidade |   equipe    | equipamentos 
+---------------------------+---------------+-------------+--------------
+ Camila Rodrigues Teixeira | Automacao     | Equipe Gama |            8
+ Antonio Carlos Silva      | Eletrica      | Equipe Alfa |            6
+ Thiago Ribeiro Dias       | Mecanica      | Equipe Beta |            6
+(3 rows)
+
+-- 2.16 equipamentos atendidos por técnicos de todas as 3 equipes, com as equipes envolvidas
+SELECT e.codigo, e.nome, string_agg(DISTINCT eq.nome, ', ') AS equipes
+FROM ordem_servico o
+JOIN equipamento e ON e.id_equipamento = o.id_equipamento
+JOIN tecnico t ON t.id_usuario = o.id_tecnico
+JOIN equipe eq ON eq.id_equipe = t.id_equipe
+GROUP BY e.codigo, e.nome
+HAVING count(DISTINCT t.id_equipe) = (SELECT count(*) FROM equipe)
+ORDER BY e.codigo;
+ codigo |           nome            |                equipes                
+--------+---------------------------+---------------------------------------
+ EQ-001 | Torno CNC                 | Equipe Alfa, Equipe Beta, Equipe Gama
+ EQ-006 | Prensa Excentrica 80 t    | Equipe Alfa, Equipe Beta, Equipe Gama
+ EQ-007 | Guilhotina Hidraulica     | Equipe Alfa, Equipe Beta, Equipe Gama
+ EQ-010 | Compressor de Ar Parafuso | Equipe Alfa, Equipe Beta, Equipe Gama
+(4 rows)
+
+-- =====================================================================
+-- PARTE 3 - CONSULTAS DOS REQUISITOS FUNCIONAIS
+-- =====================================================================
+-- RF08 - histórico completo de uma máquina, buscando por código ou nome parcial,
+--        da intervenção mais recente para a mais antiga
+SELECT e.codigo, e.nome AS equipamento, o.codigo_os,
+       CASE o.tipo_os WHEN 'C' THEN 'Corretiva' ELSE 'Preventiva' END AS tipo,
+       o.data_abertura, o.status, u.nome AS tecnico, o.leitura_horimetro,
+       coalesce(c.causa_falha, p.observacao_geral) AS detalhe
+FROM equipamento e
+JOIN ordem_servico o ON o.id_equipamento = e.id_equipamento
+JOIN usuario u ON u.id_usuario = o.id_tecnico
+LEFT JOIN manutencao_corretiva c ON c.codigo_os = o.codigo_os
+LEFT JOIN manutencao_preventiva p ON p.codigo_os = o.codigo_os
+WHERE e.codigo ILIKE '%compressor%' OR e.nome ILIKE '%compressor%'
+ORDER BY o.data_abertura DESC;
+ codigo |        equipamento        | codigo_os |    tipo    |    data_abertura    |        status        |          tecnico          | leitura_horimetro |                    detalhe                     
+--------+---------------------------+-----------+------------+---------------------+----------------------+---------------------------+-------------------+------------------------------------------------
+ EQ-010 | Compressor de Ar Parafuso |       109 | Preventiva | 2026-10-12 07:00:00 | AGUARDANDO_APROVACAO | Felipe Augusto Castro     |            3572.8 | 
+ EQ-010 | Compressor de Ar Parafuso |        96 | Corretiva  | 2026-09-18 04:27:00 | CONCLUIDA            | Camila Rodrigues Teixeira |            3447.8 | Filtro de ar obstruido
+ EQ-010 | Compressor de Ar Parafuso |        89 | Preventiva | 2026-09-12 07:00:00 | CONCLUIDA            | Joao Batista Ferreira     |            3320.6 | Ruido leve observado, sem impacto na operacao.
+ EQ-010 | Compressor de Ar Parafuso |        88 | Corretiva  | 2026-09-10 05:01:00 | CONCLUIDA            | Camila Rodrigues Teixeira |            3197.5 | Filtro de ar obstruido
+ EQ-010 | Compressor de Ar Parafuso |        86 | Corretiva  | 2026-09-06 10:03:00 | CONCLUIDA            | Camila Rodrigues Teixeira |            3057.0 | Filtro de ar obstruido
+ EQ-010 | Compressor de Ar Parafuso |        79 | Corretiva  | 2026-08-30 02:14:00 | CONCLUIDA            | Felipe Augusto Castro     |            2944.3 | Filtro de ar obstruido
+ EQ-010 | Compressor de Ar Parafuso |        72 | Preventiva | 2026-08-13 07:00:00 | CONCLUIDA            | Diego Araujo Pinto        |            2803.9 | 
+ EQ-010 | Compressor de Ar Parafuso |        56 | Preventiva | 2026-07-14 07:00:00 | CONCLUIDA            | Thiago Ribeiro Dias       |            2683.8 | 
+ EQ-010 | Compressor de Ar Parafuso |        48 | Corretiva  | 2026-07-01 17:49:00 | CONCLUIDA            | Felipe Augusto Castro     |            2623.5 | Vazamento no separador ar/oleo
+ EQ-010 | Compressor de Ar Parafuso |        41 | Preventiva | 2026-06-14 07:00:00 | CONCLUIDA            | Diego Araujo Pinto        |            2526.6 | Limpeza geral realizada.
+ EQ-010 | Compressor de Ar Parafuso |        24 | Preventiva | 2026-05-15 07:00:00 | CONCLUIDA            | Diego Araujo Pinto        |            2464.2 | Limpeza geral realizada.
+ EQ-010 | Compressor de Ar Parafuso |        21 | Corretiva  | 2026-05-08 16:24:00 | CONCLUIDA            | Felipe Augusto Castro     |            2357.3 | Vazamento no separador ar/oleo
+ EQ-010 | Compressor de Ar Parafuso |         6 | Preventiva | 2026-04-15 07:00:00 | CONCLUIDA            | Joao Batista Ferreira     |            2250.9 | 
+(13 rows)
+
+-- RF09 - tarefas preventivas da semana (de hoje até 7 dias), por vencimento:
+--        planos ativos que vencem na semana e, se já existir, a OS aberta para o vencimento
+SELECT pl.proxima_data AS vencimento, e.codigo, e.nome AS equipamento, pl.descricao AS plano,
+       pl.periodicidade, os.codigo_os, os.tecnico, coalesce(os.status, 'OS AINDA NAO GERADA') AS status
+FROM plano_preventivo pl
+JOIN equipamento e ON e.id_equipamento = pl.id_equipamento
+LEFT JOIN (SELECT mp.id_plano, o.prazo, o.codigo_os, o.status, u.nome AS tecnico
+           FROM manutencao_preventiva mp
+           JOIN ordem_servico o ON o.codigo_os = mp.codigo_os
+           JOIN usuario u ON u.id_usuario = o.id_tecnico) os
+       ON os.id_plano = pl.id_plano AND os.prazo = pl.proxima_data
+WHERE pl.ativo
+  AND pl.proxima_data BETWEEN DATE '2026-10-19' AND DATE '2026-10-19' + 7   -- CURRENT_DATE no sistema
+ORDER BY pl.proxima_data;
+ vencimento | codigo |       equipamento       |                      plano                      | periodicidade | codigo_os |        tecnico        |       status        
+------------+--------+-------------------------+-------------------------------------------------+---------------+-----------+-----------------------+---------------------
+ 2026-10-19 | EQ-003 | Fresadora Ferramenteira | Inspecao mensal da fresadora                    | MENSAL        |       112 | Antonio Carlos Silva  | PENDENTE
+ 2026-10-22 | EQ-011 | Esteira Transportadora  | Inspecao mensal da esteira                      | MENSAL        |       114 | Felipe Augusto Castro | PENDENTE
+ 2026-10-23 | EQ-005 | Prensa Hidraulica 250 t | Inspecao mensal do sistema hidraulico da prensa | MENSAL        |           |                       | OS AINDA NAO GERADA
+(3 rows)
+
+-- RF06 - alertas: preventivas que vencem em menos de 24 h e preventivas atrasadas há mais de 24 h
+SELECT o.codigo_os, e.nome AS equipamento, o.prazo, u.nome AS tecnico,
+       CASE WHEN o.prazo::timestamp < TIMESTAMP '2026-10-19 08:00' - INTERVAL '24 hours' THEN 'ATRASO'
+            ELSE 'PROXIMIDADE' END AS alerta
+FROM ordem_servico o
+JOIN equipamento e ON e.id_equipamento = o.id_equipamento
+JOIN usuario u ON u.id_usuario = o.id_tecnico
+WHERE o.tipo_os = 'P' AND o.status IN ('PENDENTE', 'EM_EXECUCAO')
+  AND (o.prazo::timestamp < TIMESTAMP '2026-10-19 08:00' - INTERVAL '24 hours'
+       OR o.prazo::timestamp <= TIMESTAMP '2026-10-19 08:00' + INTERVAL '24 hours')
+ORDER BY o.prazo;
+ codigo_os |       equipamento       |   prazo    |        tecnico        |   alerta    
+-----------+-------------------------+------------+-----------------------+-------------
+       104 | Guilhotina Hidraulica   | 2026-10-05 | Pedro Henrique Santos | ATRASO
+       105 | Torno CNC               | 2026-10-09 | Joao Batista Ferreira | ATRASO
+       108 | Estufa de Cura          | 2026-10-15 | Mariana Alves Barbosa | ATRASO
+       110 | Robo de Solda           | 2026-10-16 | Felipe Augusto Castro | ATRASO
+       111 | Cabine de Pintura       | 2026-10-17 | Thiago Ribeiro Dias   | ATRASO
+       112 | Fresadora Ferramenteira | 2026-10-19 | Antonio Carlos Silva  | PROXIMIDADE
+(6 rows)
+
+-- RF07 - relatório mensal de falhas por equipamento (corretivas por mês)
+SELECT to_char(c.data_hora_falha, 'YYYY-MM') AS mes, e.codigo, e.nome, count(*) AS falhas,
+       sum(CASE WHEN c.impacto_producao THEN 1 ELSE 0 END) AS com_parada
+FROM manutencao_corretiva c
+JOIN ordem_servico o ON o.codigo_os = c.codigo_os
+JOIN equipamento e ON e.id_equipamento = o.id_equipamento
+GROUP BY mes, e.codigo, e.nome
+ORDER BY mes, falhas DESC, e.codigo;
+   mes   | codigo |            nome             | falhas | com_parada 
+---------+--------+-----------------------------+--------+------------
+ 2026-04 | EQ-005 | Prensa Hidraulica 250 t     |      1 |          1
+ 2026-05 | EQ-005 | Prensa Hidraulica 250 t     |      3 |          1
+ 2026-05 | EQ-008 | Cabine de Pintura           |      2 |          1
+ 2026-05 | EQ-001 | Torno CNC                   |      1 |          0
+ 2026-05 | EQ-002 | Centro de Usinagem Vertical |      1 |          1
+ 2026-05 | EQ-004 | Retificadora Plana          |      1 |          1
+ 2026-05 | EQ-007 | Guilhotina Hidraulica       |      1 |          1
+ 2026-05 | EQ-010 | Compressor de Ar Parafuso   |      1 |          1
+ 2026-05 | EQ-011 | Esteira Transportadora      |      1 |          1
+ 2026-06 | EQ-001 | Torno CNC                   |      1 |          0
+ 2026-06 | EQ-007 | Guilhotina Hidraulica       |      1 |          1
+ 2026-06 | EQ-012 | Robo de Solda               |      1 |          1
+ 2026-06 | EQ-013 | Seladora Automatica         |      1 |          0
+ 2026-07 | EQ-012 | Robo de Solda               |      2 |          2
+ 2026-07 | EQ-005 | Prensa Hidraulica 250 t     |      1 |          1
+ 2026-07 | EQ-006 | Prensa Excentrica 80 t      |      1 |          0
+ 2026-07 | EQ-008 | Cabine de Pintura           |      1 |          1
+ 2026-07 | EQ-010 | Compressor de Ar Parafuso   |      1 |          0
+ 2026-08 | EQ-002 | Centro de Usinagem Vertical |      1 |          0
+ 2026-08 | EQ-005 | Prensa Hidraulica 250 t     |      1 |          1
+ 2026-08 | EQ-007 | Guilhotina Hidraulica       |      1 |          0
+ 2026-08 | EQ-010 | Compressor de Ar Parafuso   |      1 |          1
+ 2026-08 | EQ-012 | Robo de Solda               |      1 |          1
+ 2026-09 | EQ-005 | Prensa Hidraulica 250 t     |      4 |          2
+ 2026-09 | EQ-010 | Compressor de Ar Parafuso   |      3 |          1
+ 2026-09 | EQ-001 | Torno CNC                   |      2 |          1
+ 2026-09 | EQ-002 | Centro de Usinagem Vertical |      2 |          0
+ 2026-09 | EQ-011 | Esteira Transportadora      |      2 |          1
+ 2026-09 | EQ-014 | Empilhadeira Eletrica       |      1 |          1
+ 2026-10 | EQ-003 | Fresadora Ferramenteira     |      1 |          1
+ 2026-10 | EQ-009 | Estufa de Cura              |      1 |          0
+ 2026-10 | EQ-011 | Esteira Transportadora      |      1 |          1
+(32 rows)
+
+-- RF07 - relatório mensal de consumo de peças (quantidades baixadas), por peça
+SELECT to_char(b.data_baixa, 'YYYY-MM') AS mes, p.codigo, p.descricao,
+       sum(b.quantidade) AS quantidade, p.unidade_medida
+FROM baixa_peca b JOIN peca p ON p.id_peca = b.id_peca
+GROUP BY mes, p.codigo, p.descricao, p.unidade_medida
+ORDER BY mes, quantidade DESC;
+   mes   |   codigo    |                   descricao                    | quantidade | unidade_medida 
+---------+-------------+------------------------------------------------+------------+----------------
+ 2026-04 | PC-OLH-68   | Oleo hidraulico ISO VG 68                      |         25 | L
+ 2026-04 | PC-SEN-IND  | Sensor indutivo M18 PNP                        |          6 | UN
+ 2026-04 | PC-FUS-10A  | Fusivel NH 10 A                                |          4 | UN
+ 2026-04 | PC-GRX-EP2  | Graxa de litio EP2                             |          3 | KG
+ 2026-04 | PC-COR-A42  | Correia em V perfil A-42                       |          2 | UN
+ 2026-04 | PC-FIL-CAB  | Filtro de teto para cabine de pintura          |          2 | UN
+ 2026-04 | PC-FIL-AR37 | Elemento filtrante de ar para compressor GA 37 |          2 | UN
+ 2026-04 | PC-ROL-6205 | Rolamento rigido de esferas 6205-2RS           |          2 | UN
+ 2026-04 | PC-RES-SEL  | Resistencia de selagem 500 mm                  |          1 | UN
+ 2026-05 | PC-OLH-68   | Oleo hidraulico ISO VG 68                      |         13 | L
+ 2026-05 | PC-SEN-IND  | Sensor indutivo M18 PNP                        |         10 | UN
+ 2026-05 | PC-CON-24V  | Contator tripolar 24 Vcc 18 A                  |          7 | UN
+ 2026-05 | PC-FUS-10A  | Fusivel NH 10 A                                |          6 | UN
+ 2026-05 | PC-GRX-EP2  | Graxa de litio EP2                             |          5 | KG
+ 2026-05 | PC-FIL-CAB  | Filtro de teto para cabine de pintura          |          5 | UN
+ 2026-05 | PC-COR-A42  | Correia em V perfil A-42                       |          4 | UN
+ 2026-05 | PC-MAN-HID  | Mangueira hidraulica 1/2 pol. (metro)          |          2 | M
+ 2026-05 | PC-ROL-6205 | Rolamento rigido de esferas 6205-2RS           |          2 | UN
+ 2026-06 | PC-OLH-68   | Oleo hidraulico ISO VG 68                      |         28 | L
+ 2026-06 | PC-FUS-10A  | Fusivel NH 10 A                                |          6 | UN
+ 2026-06 | PC-GRX-EP2  | Graxa de litio EP2                             |          5 | KG
+ 2026-06 | PC-ROL-6205 | Rolamento rigido de esferas 6205-2RS           |          3 | UN
+ 2026-06 | PC-FIL-CAB  | Filtro de teto para cabine de pintura          |          3 | UN
+ 2026-06 | PC-RES-SEL  | Resistencia de selagem 500 mm                  |          3 | UN
+ 2026-06 | PC-SEN-IND  | Sensor indutivo M18 PNP                        |          2 | UN
+ 2026-06 | PC-MAN-HID  | Mangueira hidraulica 1/2 pol. (metro)          |          2 | M
+ 2026-06 | PC-BIC-SOL  | Bico de contato para tocha de solda 1,2 mm     |          2 | UN
+ 2026-07 | PC-OLH-68   | Oleo hidraulico ISO VG 68                      |         13 | L
+ 2026-07 | PC-SEN-IND  | Sensor indutivo M18 PNP                        |          7 | UN
+ 2026-07 | PC-CON-24V  | Contator tripolar 24 Vcc 18 A                  |          6 | UN
+ 2026-07 | PC-GRX-EP2  | Graxa de litio EP2                             |          4 | KG
+ 2026-07 | PC-ROL-6205 | Rolamento rigido de esferas 6205-2RS           |          4 | UN
+ 2026-07 | PC-BIC-SOL  | Bico de contato para tocha de solda 1,2 mm     |          3 | UN
+ 2026-07 | PC-FUS-10A  | Fusivel NH 10 A                                |          2 | UN
+ 2026-07 | PC-RES-SEL  | Resistencia de selagem 500 mm                  |          1 | UN
+ 2026-08 | PC-OLH-68   | Oleo hidraulico ISO VG 68                      |         34 | L
+ 2026-08 | PC-CON-24V  | Contator tripolar 24 Vcc 18 A                  |          9 | UN
+ 2026-08 | PC-ROL-6205 | Rolamento rigido de esferas 6205-2RS           |          7 | UN
+ 2026-08 | PC-SEN-IND  | Sensor indutivo M18 PNP                        |          4 | UN
+ 2026-08 | PC-FIL-AR37 | Elemento filtrante de ar para compressor GA 37 |          3 | UN
+ 2026-08 | PC-BIC-SOL  | Bico de contato para tocha de solda 1,2 mm     |          2 | UN
+ 2026-08 | PC-COR-A42  | Correia em V perfil A-42                       |          2 | UN
+ 2026-08 | PC-FUS-10A  | Fusivel NH 10 A                                |          2 | UN
+ 2026-08 | PC-GRX-EP2  | Graxa de litio EP2                             |          2 | KG
+ 2026-08 | PC-MAN-HID  | Mangueira hidraulica 1/2 pol. (metro)          |          2 | M
+ 2026-08 | PC-FIL-CAB  | Filtro de teto para cabine de pintura          |          1 | UN
+ 2026-08 | PC-RET-H60  | Kit de vedacao para cilindro hidraulico 60 mm  |          1 | UN
+ 2026-09 | PC-OLH-68   | Oleo hidraulico ISO VG 68                      |         37 | L
+ 2026-09 | PC-ROL-6205 | Rolamento rigido de esferas 6205-2RS           |         13 | UN
+ 2026-09 | PC-GRX-EP2  | Graxa de litio EP2                             |         11 | KG
+ 2026-09 | PC-SEN-IND  | Sensor indutivo M18 PNP                        |         10 | UN
+ 2026-09 | PC-MAN-HID  | Mangueira hidraulica 1/2 pol. (metro)          |          6 | M
+ 2026-09 | PC-FIL-AR37 | Elemento filtrante de ar para compressor GA 37 |          3 | UN
+ 2026-09 | PC-COR-A42  | Correia em V perfil A-42                       |          3 | UN
+ 2026-09 | PC-RET-H60  | Kit de vedacao para cilindro hidraulico 60 mm  |          2 | UN
+ 2026-09 | PC-CON-24V  | Contator tripolar 24 Vcc 18 A                  |          2 | UN
+ 2026-10 | PC-OLH-68   | Oleo hidraulico ISO VG 68                      |         16 | L
+ 2026-10 | PC-ROL-6205 | Rolamento rigido de esferas 6205-2RS           |          7 | UN
+ 2026-10 | PC-COR-A42  | Correia em V perfil A-42                       |          4 | UN
+ 2026-10 | PC-CON-24V  | Contator tripolar 24 Vcc 18 A                  |          3 | UN
+ 2026-10 | PC-SEN-IND  | Sensor indutivo M18 PNP                        |          3 | UN
+ 2026-10 | PC-FUS-10A  | Fusivel NH 10 A                                |          2 | UN
+ 2026-10 | PC-GRX-EP2  | Graxa de litio EP2                             |          1 | KG
+(63 rows)
+
+-- RF07 - consumo de peças por máquina em um período (setembro e outubro de 2026)
+SELECT e.codigo, e.nome AS equipamento, p.descricao AS peca, sum(b.quantidade) AS quantidade, p.unidade_medida
+FROM baixa_peca b
+JOIN peca p ON p.id_peca = b.id_peca
+JOIN ordem_servico o ON o.codigo_os = b.codigo_os
+JOIN equipamento e ON e.id_equipamento = o.id_equipamento
+WHERE b.data_baixa >= DATE '2026-09-01' AND b.data_baixa < DATE '2026-11-01'
+GROUP BY e.codigo, e.nome, p.descricao, p.unidade_medida
+ORDER BY e.codigo, quantidade DESC;
+ codigo |         equipamento         |                      peca                      | quantidade | unidade_medida 
+--------+-----------------------------+------------------------------------------------+------------+----------------
+ EQ-001 | Torno CNC                   | Rolamento rigido de esferas 6205-2RS           |          5 | UN
+ EQ-001 | Torno CNC                   | Correia em V perfil A-42                       |          3 | UN
+ EQ-001 | Torno CNC                   | Graxa de litio EP2                             |          2 | KG
+ EQ-001 | Torno CNC                   | Sensor indutivo M18 PNP                        |          2 | UN
+ EQ-002 | Centro de Usinagem Vertical | Graxa de litio EP2                             |          3 | KG
+ EQ-002 | Centro de Usinagem Vertical | Sensor indutivo M18 PNP                        |          2 | UN
+ EQ-003 | Fresadora Ferramenteira     | Rolamento rigido de esferas 6205-2RS           |          3 | UN
+ EQ-003 | Fresadora Ferramenteira     | Correia em V perfil A-42                       |          2 | UN
+ EQ-005 | Prensa Hidraulica 250 t     | Oleo hidraulico ISO VG 68                      |         15 | L
+ EQ-005 | Prensa Hidraulica 250 t     | Mangueira hidraulica 1/2 pol. (metro)          |          6 | M
+ EQ-005 | Prensa Hidraulica 250 t     | Kit de vedacao para cilindro hidraulico 60 mm  |          2 | UN
+ EQ-006 | Prensa Excentrica 80 t      | Rolamento rigido de esferas 6205-2RS           |          3 | UN
+ EQ-006 | Prensa Excentrica 80 t      | Graxa de litio EP2                             |          3 | KG
+ EQ-006 | Prensa Excentrica 80 t      | Contator tripolar 24 Vcc 18 A                  |          1 | UN
+ EQ-007 | Guilhotina Hidraulica       | Oleo hidraulico ISO VG 68                      |         16 | L
+ EQ-009 | Estufa de Cura              | Contator tripolar 24 Vcc 18 A                  |          2 | UN
+ EQ-009 | Estufa de Cura              | Fusivel NH 10 A                                |          2 | UN
+ EQ-009 | Estufa de Cura              | Sensor indutivo M18 PNP                        |          2 | UN
+ EQ-010 | Compressor de Ar Parafuso   | Oleo hidraulico ISO VG 68                      |         22 | L
+ EQ-010 | Compressor de Ar Parafuso   | Rolamento rigido de esferas 6205-2RS           |          3 | UN
+ EQ-010 | Compressor de Ar Parafuso   | Elemento filtrante de ar para compressor GA 37 |          3 | UN
+ EQ-011 | Esteira Transportadora      | Rolamento rigido de esferas 6205-2RS           |          6 | UN
+ EQ-011 | Esteira Transportadora      | Sensor indutivo M18 PNP                        |          5 | UN
+ EQ-011 | Esteira Transportadora      | Graxa de litio EP2                             |          4 | KG
+ EQ-011 | Esteira Transportadora      | Correia em V perfil A-42                       |          2 | UN
+ EQ-012 | Robo de Solda               | Sensor indutivo M18 PNP                        |          2 | UN
+ EQ-014 | Empilhadeira Eletrica       | Contator tripolar 24 Vcc 18 A                  |          2 | UN
+(27 rows)
+
+-- RF05 - MTTR (tempo médio de reparo, em horas) por equipamento, com base nas corretivas concluídas
+SELECT e.codigo, e.nome,
+       count(*) AS reparos,
+       round(avg(EXTRACT(EPOCH FROM (o.data_fim_execucao - o.data_inicio_execucao)) / 3600)::numeric, 2) AS mttr_horas
+FROM ordem_servico o JOIN equipamento e ON e.id_equipamento = o.id_equipamento
+WHERE o.tipo_os = 'C' AND o.status = 'CONCLUIDA'
+GROUP BY e.codigo, e.nome
+ORDER BY mttr_horas DESC;
+ codigo |            nome             | reparos | mttr_horas 
+--------+-----------------------------+---------+------------
+ EQ-014 | Empilhadeira Eletrica       |       1 |       6.17
+ EQ-005 | Prensa Hidraulica 250 t     |      10 |       5.56
+ EQ-002 | Centro de Usinagem Vertical |       4 |       5.35
+ EQ-006 | Prensa Excentrica 80 t      |       1 |       5.18
+ EQ-004 | Retificadora Plana          |       1 |       5.13
+ EQ-008 | Cabine de Pintura           |       3 |       4.66
+ EQ-010 | Compressor de Ar Parafuso   |       6 |       4.57
+ EQ-011 | Esteira Transportadora      |       4 |       3.87
+ EQ-012 | Robo de Solda               |       4 |       3.83
+ EQ-013 | Seladora Automatica         |       1 |       3.72
+ EQ-001 | Torno CNC                   |       4 |       3.52
+ EQ-007 | Guilhotina Hidraulica       |       3 |       3.21
+(12 rows)
+
+-- RF15 - ranking das 10 máquinas com mais falhas nos últimos 90 dias, com o MTBF atual
+--        (MTBF = média, em horas, do intervalo entre falhas consecutivas do equipamento;
+--         fica nulo quando o equipamento tem uma única falha registrada)
+WITH falhas AS (
+    SELECT o.id_equipamento, c.data_hora_falha,
+           c.data_hora_falha - lag(c.data_hora_falha) OVER (PARTITION BY o.id_equipamento
+                                                            ORDER BY c.data_hora_falha) AS intervalo
+    FROM manutencao_corretiva c JOIN ordem_servico o ON o.codigo_os = c.codigo_os
+),
+mtbf AS (
+    SELECT id_equipamento, round(avg(EXTRACT(EPOCH FROM intervalo) / 3600)::numeric, 1) AS mtbf_horas
+    FROM falhas GROUP BY id_equipamento
+)
+SELECT e.codigo, e.nome, count(*) AS falhas_no_periodo, m.mtbf_horas
+FROM falhas f
+JOIN equipamento e ON e.id_equipamento = f.id_equipamento
+JOIN mtbf m ON m.id_equipamento = f.id_equipamento
+WHERE f.data_hora_falha >= TIMESTAMP '2026-10-19 08:00' - INTERVAL '90 days'   -- now() no sistema
+GROUP BY e.codigo, e.nome, m.mtbf_horas
+ORDER BY falhas_no_periodo DESC, e.codigo
+LIMIT 10;
+ codigo |            nome             | falhas_no_periodo | mtbf_horas 
+--------+-----------------------------+-------------------+------------
+ EQ-005 | Prensa Hidraulica 250 t     |                 5 |      404.0
+ EQ-010 | Compressor de Ar Parafuso   |                 4 |      636.1
+ EQ-002 | Centro de Usinagem Vertical |                 3 |      809.9
+ EQ-011 | Esteira Transportadora      |                 3 |     1079.7
+ EQ-001 | Torno CNC                   |                 2 |      946.6
+ EQ-012 | Robo de Solda               |                 2 |      524.4
+ EQ-003 | Fresadora Ferramenteira     |                 1 |           
+ EQ-007 | Guilhotina Hidraulica       |                 1 |     1166.4
+ EQ-009 | Estufa de Cura              |                 1 |           
+ EQ-014 | Empilhadeira Eletrica       |                 1 |           
+(10 rows)
+
+-- RF05 - disponibilidade atual das máquinas: em manutenção se há OS em execução
+SELECT e.codigo, e.nome, e.criticidade,
+       CASE WHEN EXISTS (SELECT 1 FROM ordem_servico o
+                         WHERE o.id_equipamento = e.id_equipamento AND o.status = 'EM_EXECUCAO')
+            THEN 'EM MANUTENCAO' ELSE 'DISPONIVEL' END AS situacao
+FROM equipamento e
+WHERE e.ativo
+ORDER BY situacao DESC, e.codigo;
+ codigo |            nome             | criticidade |   situacao    
+--------+-----------------------------+-------------+---------------
+ EQ-001 | Torno CNC                   | ALTA        | EM MANUTENCAO
+ EQ-007 | Guilhotina Hidraulica       | MEDIA       | EM MANUTENCAO
+ EQ-009 | Estufa de Cura              | MEDIA       | EM MANUTENCAO
+ EQ-012 | Robo de Solda               | ALTA        | EM MANUTENCAO
+ EQ-002 | Centro de Usinagem Vertical | ALTA        | DISPONIVEL
+ EQ-003 | Fresadora Ferramenteira     | MEDIA       | DISPONIVEL
+ EQ-004 | Retificadora Plana          | BAIXA       | DISPONIVEL
+ EQ-005 | Prensa Hidraulica 250 t     | ALTA        | DISPONIVEL
+ EQ-006 | Prensa Excentrica 80 t      | MEDIA       | DISPONIVEL
+ EQ-008 | Cabine de Pintura           | ALTA        | DISPONIVEL
+ EQ-010 | Compressor de Ar Parafuso   | ALTA        | DISPONIVEL
+ EQ-011 | Esteira Transportadora      | MEDIA       | DISPONIVEL
+ EQ-013 | Seladora Automatica         | BAIXA       | DISPONIVEL
+ EQ-014 | Empilhadeira Eletrica       | BAIXA       | DISPONIVEL
+(14 rows)
+
+-- RF14 - status de cada técnico, com a OS em andamento (se houver)
+SELECT eq.nome AS equipe, u.nome AS tecnico, t.status_operacional,
+       o.codigo_os AS os_em_andamento, e.nome AS equipamento
+FROM tecnico t
+JOIN usuario u ON u.id_usuario = t.id_usuario
+JOIN equipe eq ON eq.id_equipe = t.id_equipe
+LEFT JOIN ordem_servico o ON o.id_tecnico = t.id_usuario AND o.status = 'EM_EXECUCAO'
+LEFT JOIN equipamento e ON e.id_equipamento = o.id_equipamento
+ORDER BY eq.nome, u.nome;
+   equipe    |          tecnico          | status_operacional | os_em_andamento |      equipamento      
+-------------+---------------------------+--------------------+-----------------+-----------------------
+ Equipe Alfa | Antonio Carlos Silva      | DISPONIVEL         |                 | 
+ Equipe Alfa | Joao Batista Ferreira     | OCUPADO            |             105 | Torno CNC
+ Equipe Alfa | Lucas Gabriel Moreira     | DISPONIVEL         |                 | 
+ Equipe Alfa | Pedro Henrique Santos     | OCUPADO            |             104 | Guilhotina Hidraulica
+ Equipe Beta | Bruno Cesar Cardoso       | DISPONIVEL         |                 | 
+ Equipe Beta | Mariana Alves Barbosa     | OCUPADO            |             108 | Estufa de Cura
+ Equipe Beta | Rodrigo Mendes Freitas    | DISPONIVEL         |                 | 
+ Equipe Beta | Thiago Ribeiro Dias       | DISPONIVEL         |                 | 
+ Equipe Gama | Camila Rodrigues Teixeira | DISPONIVEL         |                 | 
+ Equipe Gama | Diego Araujo Pinto        | OCUPADO            |             113 | Estufa de Cura
+ Equipe Gama | Felipe Augusto Castro     | OCUPADO            |             110 | Robo de Solda
+ Equipe Gama | Gustavo Henrique Lopes    | DISPONIVEL         |                 | 
+(12 rows)
+
+-- RF16 - produtividade por equipe no mês corrente (01/10/2026 até hoje):
+--        tarefas planejadas (prazo no período) x concluídas e percentual de conclusão
+SELECT eq.nome AS equipe,
+       count(*) AS planejadas,
+       count(*) FILTER (WHERE o.status = 'CONCLUIDA') AS concluidas,
+       round(100.0 * count(*) FILTER (WHERE o.status = 'CONCLUIDA') / count(*), 1) AS percentual
+FROM ordem_servico o
+JOIN tecnico t ON t.id_usuario = o.id_tecnico
+JOIN equipe eq ON eq.id_equipe = t.id_equipe
+WHERE o.prazo >= DATE '2026-10-01' AND o.prazo <= DATE '2026-10-19'   -- CURRENT_DATE no sistema
+GROUP BY eq.nome
+ORDER BY eq.nome;
+   equipe    | planejadas | concluidas | percentual 
+-------------+------------+------------+------------
+ Equipe Alfa |          5 |          0 |        0.0
+ Equipe Beta |          4 |          2 |       50.0
+ Equipe Gama |          4 |          1 |       25.0
+(3 rows)
+
+-- RF16 - produtividade por técnico nas últimas 4 semanas (por semana)
+SELECT date_trunc('week', o.prazo)::date AS semana, u.nome AS tecnico,
+       count(*) AS planejadas,
+       count(*) FILTER (WHERE o.status = 'CONCLUIDA') AS concluidas
+FROM ordem_servico o JOIN usuario u ON u.id_usuario = o.id_tecnico
+WHERE o.prazo >= DATE '2026-10-19' - 28 AND o.prazo < DATE '2026-10-19'
+GROUP BY semana, u.nome
+ORDER BY semana, u.nome;
+   semana   |          tecnico          | planejadas | concluidas 
+------------+---------------------------+------------+------------
+ 2026-09-21 | Camila Rodrigues Teixeira |          2 |          2
+ 2026-09-21 | Diego Araujo Pinto        |          1 |          1
+ 2026-09-21 | Rodrigo Mendes Freitas    |          1 |          1
+ 2026-09-28 | Diego Araujo Pinto        |          1 |          1
+ 2026-09-28 | Felipe Augusto Castro     |          1 |          1
+ 2026-09-28 | Mariana Alves Barbosa     |          2 |          2
+ 2026-10-05 | Antonio Carlos Silva      |          1 |          0
+ 2026-10-05 | Joao Batista Ferreira     |          1 |          0
+ 2026-10-05 | Pedro Henrique Santos     |          2 |          0
+ 2026-10-12 | Diego Araujo Pinto        |          1 |          0
+ 2026-10-12 | Felipe Augusto Castro     |          2 |          0
+ 2026-10-12 | Mariana Alves Barbosa     |          1 |          0
+ 2026-10-12 | Thiago Ribeiro Dias       |          1 |          0
+(13 rows)
+
+-- RF12 - OS aguardando aprovação, por supervisor responsável pela equipe do técnico
+SELECT us.nome AS supervisor, o.codigo_os, CASE o.tipo_os WHEN 'C' THEN 'Corretiva' ELSE 'Preventiva' END AS tipo,
+       e.nome AS equipamento, ut.nome AS tecnico, o.data_fim_execucao
+FROM ordem_servico o
+JOIN tecnico t ON t.id_usuario = o.id_tecnico
+JOIN equipe eq ON eq.id_equipe = t.id_equipe
+JOIN usuario us ON us.id_usuario = eq.id_supervisor
+JOIN usuario ut ON ut.id_usuario = o.id_tecnico
+JOIN equipamento e ON e.id_equipamento = o.id_equipamento
+WHERE o.status = 'AGUARDANDO_APROVACAO'
+ORDER BY us.nome, o.data_fim_execucao;
+      supervisor       | codigo_os |    tipo    |        equipamento        |        tecnico        |  data_fim_execucao  
+-----------------------+-----------+------------+---------------------------+-----------------------+---------------------
+ Fernanda Souza Lima   |       106 | Corretiva  | Fresadora Ferramenteira   | Antonio Carlos Silva  | 2026-10-08 00:49:00
+ Fernanda Souza Lima   |       107 | Preventiva | Seladora Automatica       | Pedro Henrique Santos | 2026-10-11 12:09:00
+ Juliana Pereira Costa |       109 | Preventiva | Compressor de Ar Parafuso | Felipe Augusto Castro | 2026-10-16 10:26:00
+(3 rows)
+
+-- RF12 - OS rejeitadas que voltaram para o técnico, com a justificativa
+SELECT o.codigo_os, ut.nome AS tecnico, us.nome AS avaliador, o.data_avaliacao, o.justificativa
+FROM ordem_servico o
+JOIN usuario ut ON ut.id_usuario = o.id_tecnico
+JOIN usuario us ON us.id_usuario = o.id_supervisor_avaliador
+WHERE o.decisao_avaliacao = 'REJEITADA';
+ codigo_os |        tecnico        |      avaliador      |   data_avaliacao    |                           justificativa                            
+-----------+-----------------------+---------------------+---------------------+--------------------------------------------------------------------
+       104 | Pedro Henrique Santos | Fernanda Souza Lima | 2026-10-04 21:27:00 | Peca trocada nao confere com a falha descrita; refazer diagnostico
+       105 | Joao Batista Ferreira | Fernanda Souza Lima | 2026-10-06 20:52:00 | Checklist sem observacao sobre o vazamento relatado pela producao
+(2 rows)
+
+-- RF03 - checklist de uma preventiva (itens do equipamento x itens respondidos);
+--        itens obrigatórios sem resposta bloqueiam a conclusão
+SELECT o.codigo_os, i.num_item, i.descricao, i.obrigatorio,
+       coalesce(r.resultado, 'SEM RESPOSTA') AS resultado, r.observacao
+FROM ordem_servico o
+JOIN item_checklist i ON i.id_equipamento = o.id_equipamento
+LEFT JOIN resultado_checklist r ON r.codigo_os = o.codigo_os AND r.id_equipamento = i.id_equipamento
+                               AND r.num_item = i.num_item
+WHERE o.tipo_os = 'P' AND o.status = 'EM_EXECUCAO'
+ORDER BY o.codigo_os, i.num_item;
+ codigo_os | num_item |                descricao                | obrigatorio |  resultado   |         observacao          
+-----------+----------+-----------------------------------------+-------------+--------------+-----------------------------
+       104 |        1 | Verificar afiacao das laminas           | t           | VERIFICADO   | 
+       104 |        2 | Inspecionar sistema hidraulico          | t           | VERIFICADO   | 
+       104 |        3 | Testar protecao frontal                 | t           | VERIFICADO   | 
+       105 |        1 | Verificar nivel do oleo de lubrificacao | t           | VERIFICADO   | 
+       105 |        2 | Limpar cavacos do barramento            | t           | VERIFICADO   | 
+       105 |        3 | Conferir aperto da placa e castanhas    | t           | VERIFICADO   | Ajustado durante a inspecao
+       105 |        4 | Testar parada de emergencia             | t           | VERIFICADO   | 
+       105 |        5 | Verificar folga do fuso                 | f           | VERIFICADO   | 
+       108 |        1 | Verificar queimadores                   | t           | VERIFICADO   | 
+       108 |        2 | Conferir controle de temperatura        | t           | SEM RESPOSTA | 
+       108 |        3 | Inspecionar vedacao das portas          | t           | SEM RESPOSTA | 
+       110 |        1 | Verificar cabos e conectores            | t           | VERIFICADO   | 
+       110 |        2 | Limpar bocal e trocar bico de contato   | t           | VERIFICADO   | 
+       110 |        3 | Calibrar ponto zero (TCP)               | t           | SEM RESPOSTA | 
+       110 |        4 | Testar barreiras de seguranca           | f           | SEM RESPOSTA | 
+(15 rows)
+
+-- RF13 - peças no estoque mínimo ou abaixo dele, com a data do último alerta gerado
+SELECT p.codigo, p.descricao, p.quantidade_atual, p.estoque_minimo, p.unidade_medida,
+       (SELECT max(n.data_geracao) FROM notificacao n
+        WHERE n.id_peca = p.id_peca AND n.tipo = 'ESTOQUE_MINIMO') AS ultimo_alerta
+FROM peca p
+WHERE p.ativo AND p.quantidade_atual <= p.estoque_minimo
+ORDER BY p.quantidade_atual::numeric / nullif(p.estoque_minimo, 0);
+   codigo    |                   descricao                    | quantidade_atual | estoque_minimo | unidade_medida |    ultimo_alerta    
+-------------+------------------------------------------------+------------------+----------------+----------------+---------------------
+ PC-RES-SEL  | Resistencia de selagem 500 mm                  |                1 |              2 | UN             | 2026-06-07 18:06:00
+ PC-OLH-68   | Oleo hidraulico ISO VG 68                      |               35 |             40 | L              | 2026-10-04 12:14:00
+ PC-BIC-SOL  | Bico de contato para tocha de solda 1,2 mm     |               18 |             20 | UN             | 2026-07-22 23:32:00
+ PC-FIL-AR37 | Elemento filtrante de ar para compressor GA 37 |                2 |              2 | UN             | 2026-09-06 12:05:00
+(4 rows)
+
+-- Notificações não lidas por usuário e por tipo
+SELECT u.nome, n.tipo, count(*) AS nao_lidas
+FROM notificacao_usuario nu
+JOIN notificacao n ON n.id_notificacao = nu.id_notificacao
+JOIN usuario u ON u.id_usuario = nu.id_usuario
+WHERE nu.data_leitura IS NULL
+GROUP BY u.nome, n.tipo
+ORDER BY u.nome, n.tipo;
+         nome          |    tipo     | nao_lidas 
+-----------------------+-------------+-----------
+ Antonio Carlos Silva  | PROXIMIDADE |         1
+ Diego Araujo Pinto    | NOVA_OS     |         1
+ Felipe Augusto Castro | NOVA_OS     |         1
+ Fernanda Souza Lima   | PROXIMIDADE |         1
+ Thiago Ribeiro Dias   | ATRASO      |         1
+(5 rows)
+
